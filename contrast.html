@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Règles de contraste automatique avec OKLCH. Accessibilité sans effort.">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <title>Contraste Automatique | Lab OKLCH</title>
+ </head>
+ <body>
+  <div class="container">
+    <header>
+     <h1>Le Contraste Automatique</h1>
+     <p>OKLCH peut vous éloigner des graphistes <br>
+        (un peu)</p>
+    </header>
+
+    <section class="doc-section">
+     <h2>Le paradigme qui change tout</h2>
+     <p>
+      Jusqu'à présent on faisait toujours la même chose.
+      On choisissait une couleur de fond.
+      Puis on choisissait une couleur de texte par dessus.
+      Puis on allait vérifier le contraste. Puis on changeait.
+      Puis on revérifiait. Puis c'était toujours pas bon.
+      Sauf si tu avais des outils de graphistes.
+      Et encore, c'était pas toujours bon.
+      Surtout si tu voulais faire un thème sombre et un thème clair.
+      C'est quand même 2 fois plus de travail.
+     </p>
+     <p>
+      Avec OKLCH on PEUT ne PLUS faire ça.
+     </p>
+     <p>
+      On n'écrit plus des couleurs. On écrit des
+      <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">RÈGLES</mark> de couleurs.
+     </p>
+     <p>
+      Tu dis une seule fois : "si le fond est plus sombre que 50% de luminosité,
+      le texte est blanc. Sinon il est noir".
+      Et c'est terminé.
+      Plus jamais tu ne repenses au contraste.
+      Plus jamais tu n'as de problème d'accessibilité.
+      Enfin, si, mais c'est différent.. on y reviendra. Regarde déjà l'exemple
+     </p>
+
+     <div class="dev-code">
+.class {<br>
+  --bg: oklch(from var(--clr-brand) l c calc(h + 45));<br>
+}
+     </div>
+
+     <p>
+      C'est pas un truc. Il faut penser mathématique. On dit à la classe
+      "prend la variable <code>--bg</code> puis applique les valeurs OKLCH
+      que tu trouves dans la variable <code>--clr-brand</code>.
+      Mais ATTENTION !, pour l'hue', tu ne prends pas la valeur de
+      <code>--clr-brand</code>, tu calcules une nouvelle teinte. tu prends la teinte d'orgine de la variable et tu ajoutes + 45°.
+     </p>
+
+     <h3>La version améliorée qui résout ce que j'ai appelé la boring zone :D</h3>
+     <p>
+      Le vrai problème c'est le résultat entre 40% et 60% de luminosité. C'est la zone grise. Rien n'est jamais vraiment noir ou vraiment blanc.
+      Le contraste est toujours un peu merdique.
+     </p>
+     <p>
+      Donc on améliore la sélection des variables avec une déclaration déjà pré-établie.
+      Voici un exemple de ce qu'il est possible d'avoir (moi j'ai fais plus simple,
+      mais je ferais la démo plus bas) :
+     </p>
+
+     <div class="dev-code">
+.class {<br>
+  --clr-accent-1: oklch(from var(--bg) calc(l - 0.3) calc(c - 0.3) h / 0.8);<br>
+ --clr-accent-2: oklch(from var(--bg) calc(l - 0.4) calc(c - 0.2) h / 0.8);<br>
+ --clr-accent-3: oklch(from var(--bg) calc(l - 0.6) calc(c - 0.1) h / 0.8);<br>
+}
+     </div>
+
+     <p>
+      Alors attention, je décortique :
+     </p>
+
+     <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+      <li> Déjà rappel from c'est pour récupérer la couleur qui nous intéresse pour changer les valeurs</li>
+      <li>Je déclare 3 sorte d'accent</li>
+      <li>Sur la variable <code>--bg</code>, je dit qu'il faut enlever
+        <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.3</mark> de <code>l</code> et
+        <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.3</mark> de <code>c</code> et
+        une petite transparence de <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.8</mark> (20% de transparence en gros)</li>
+      <li><mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">LE TRICK</mark> : 
+        OKLCH est calculé en fonction du résultat de <code>--bg</code>.</li>
+      <li>Et pour finir on prend la teinte <code>h</code> 
+        exacte de fond sans la modifier.</li>
+     </ul>
+
+     <p>
+      <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Résultat :</mark> tu peux choisir uniquement
+       en changeant les variables pour choisir ton constraste.
+       Tu peux faire du noir et blanc, du sombre,
+       du clair, du rouge, du..... bref. Le contraste sera propre.
+     <p>
+      Mais le truc chiant : Faut pas oublier de vérifier 
+      si on change <code>--h-brand</code>, c'est pas 100% parfais.
+     <h3>Ce que ça donne en vrai</h3>
+     <p>
+      Voilà exactement ce que ça donne avec les 4 angles de la roue. Dans tous les cas le texte est toujours parfaitement lisible. Tu peux changer la valeur de `--h-brand` à 330 dans le CSS, tout s'actualisera automatiquement.
+     </p>
+
+    <div class="palette-grid">
+      <div class="color-card">
+        <div class="color-swatch swatch-base">
+          <span>BASE 0°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"
+          preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)" 
+              stroke="none" fill="var(--clr-accent-1)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="color-info">
+          --clr-accent-1 : mouhai
+          <code>calc(l - 0.4)<br>
+          passe pas</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-analogous">
+          <span>+45°</span>
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 1280 1280" preserveAspectRatio="xMidYMid meet">
+              <metadata>
+                Created by potrace 1.15, written by Peter Selinger 2001-2017
+              </metadata>
+              <g transform="translate(0,1280) scale(0.1,-0.1)" stroke="none" fill="var(--clr-accent-1)">
+                <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+                  -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+                  -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+                  3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+                  4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+                  885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+                  -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+                  -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+                  -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+                  1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+                  122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+                  -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+                  -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+                  -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+                  262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+                  1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+                  -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+                  112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+                  -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+                  -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+                  399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+              </g>
+            </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-1:
+          spécial...
+          <code>-calc(l - 0.4)<br>
+          sa pique hein?</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-complementary">
+          <span>+180°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+              <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+              </metadata>
+              <g transform="translate(0,1280) scale(0.1,-0.1)"
+                stroke="none" fill="var(--clr-accent-1)">
+                <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+                -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+                -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+                3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+                4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+                885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+                -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+                -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+                -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+                1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+                122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+                -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+                -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+                -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+                262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+                1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+                -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+                112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+                -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+                -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+                399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+              </g>
+          </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-1 : <br>
+          pas mal...
+          <code>L'oeil perçoit une harmonie</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-triadic">
+          <span>-120°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+              <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+              </metadata>
+              <g transform="translate(0,1280) scale(0.1,-0.1)"
+                stroke="none" fill="var(--clr-accent-1)">
+                <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+                -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+                -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+                3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+                4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+                885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+                -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+                -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+                -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+                1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+                122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+                -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+                -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+                -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+                262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+                1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+                -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+                112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+                -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+                -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+                399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+              </g>
+          </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-1 : <br>
+          Même le boring
+          <code>Cela passe, mais...</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-grid">
+      <div class="color-card">
+        <div class="color-swatch swatch-base">
+          <span>BASE 0°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 1280 1280"
+              preserveAspectRatio="xMidYMid meet">
+              <metadata>
+                Created by potrace 1.15, written by Peter Selinger 2001-2017
+              </metadata>
+              <g transform="translate(0,1280) scale(0.1,-0.1)"
+                stroke="none" fill="var(--clr-accent-2)">
+                <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+                -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+                -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+                3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+                4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+                885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+                -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+                -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+                -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+                1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+                122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+                -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+                -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+                -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+                262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+                1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+                -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+                112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+                -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+                -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+                399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+              </g>
+          </svg>
+        </div>
+      
+        <div class="color-info">
+          --clr-accent-2 : <br>
+          <code>on force sur<br>
+          l et c</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-analogous">
+          <span>+45°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)"
+              stroke="none" fill="var(--clr-accent-2)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+                -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+                -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+                3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+                4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+                885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+                -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+                -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+                -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+                1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+                122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+                -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+                -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+                -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+                262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+                1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+                -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+                112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+                -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+                -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+                399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+        
+        <div class="color-info">
+          --clr-accent-2 : <br>
+          <code>on force sur<br>
+          l et c</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-complementary">
+          <span>+180°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)"
+              stroke="none" fill="var(--clr-accent-2)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-2 : <br>
+          <code>on force sur<br>
+          l et c</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-triadic">
+          <span>-120°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)"
+              stroke="none" fill="var(--clr-accent-2)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-2 : <br>
+          <code>on force sur<br>
+          l et c</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-grid">
+      <div class="color-card">
+        <div class="color-swatch swatch-base">
+          <span>BASE 0°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)" stroke="none"
+              fill="var(--clr-accent-3)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-3 : <br>
+          <code>on force + sur<br>
+          l et c</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-analogous">
+          <span>+45°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)"
+              stroke="none" fill="var(--clr-accent-3)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+       
+        <div class="color-info">
+          --clr-accent-3 : <br>
+          <code>on force + sur<br>
+          l et c</code>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch swatch-complementary">
+          <span>+180°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)"
+              stroke="none" fill="var(--clr-accent-3)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="color-info">
+          --clr-accent-3:
+          <code>ha, est-ce plus contrasté ?</code>
+        </div>
+
+        </div>
+
+        <div class="color-card">
+        <div class="color-swatch swatch-triadic">
+          <span>-120°</span>
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1280 1280"
+            preserveAspectRatio="xMidYMid meet">
+            <metadata>
+              Created by potrace 1.15, written by Peter Selinger 2001-2017
+            </metadata>
+            <g transform="translate(0,1280) scale(0.1,-0.1)"
+              stroke="none" fill="var(--clr-accent-3)">
+              <path d="M6085 12794 c-110 -6 -329 -25 -415 -35 -1807 -211 -3431 -1170
+              -4482 -2647 -598 -839 -981 -1799 -1127 -2827 -44 -308 -56 -489 -56 -885 0
+              -396 12 -577 56 -885 198 -1388 828 -2653 1814 -3640 981 -982 2253 -1616
+              3640 -1814 308 -44 489 -56 885 -56 396 0 577 12 885 56 1752 250 3307 1194
+              4327 2627 598 839 981 1799 1127 2827 44 308 56 489 56 885 0 396 -12 577 -56
+              885 -250 1752 -1194 3307 -2627 4327 -928 661 -1964 1046 -3137 1163 -141 15
+              -750 27 -890 19z m-584 -1481 c-10 -21 -221 -472 -469 -1003 -247 -531 -730
+              -1566 -1072 -2300 -1040 -2230 -1380 -2960 -1652 -3545 -144 -308 -264 -564
+              -268 -568 -12 -14 -242 456 -318 648 -240 610 -352 1201 -352 1855 0 654 113
+              1247 352 1855 245 618 610 1180 1083 1664 694 710 1568 1192 2550 1405 61 13
+              122 24 138 25 l27 1 -19 -37z m1934 12 c1190 -250 2261 -932 2992 -1907 442
+              -588 763 -1307 907 -2028 69 -343 96 -626 96 -990 0 -654 -112 -1245 -352
+              -1855 -76 -191 -306 -662 -318 -648 -4 4 -61 125 -127 268 -130 279 -622 1333
+              -1343 2880 -246 528 -728 1561 -1070 2295 -342 734 -693 1487 -780 1673 -123
+              262 -154 337 -141 337 9 0 71 -11 136 -25z m-978 -1438 c49 -107 377 -812
+              1202 -2580 209 -449 381 -818 381 -820 0 -1 -738 -2 -1640 -2 -902 0 -1640 1
+              -1640 2 0 2 172 371 381 820 825 1768 1153 2473 1202 2580 29 62 54 112 57
+              112 3 0 28 -50 57 -112z m2362 -5067 c544 -1166 986 -2116 986 -2122 0 -4 -58
+              -57 -129 -118 -764 -654 -1704 -1064 -2701 -1180 -363 -41 -787 -41 -1150 0
+              -799 93 -1568 377 -2236 826 -191 129 -297 211 -570 444 l-29 25 194 415 c186
+              399 863 1849 913 1958 l24 52 2280 -2 2280 -3 138 -295z"/>
+            </g>
+          </svg>
+        </div>
+       
+        <div class="color-info">
+          --clr-accent-3 : <br>
+          <code>cette nuance est plus facile ?</code>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      C'est là qu'on voit la différence et l'importance des contrastes, chromas.
+      Un jour, peut-être qu'on pourra calculer des variables sur des variables pré-existantes.
+      J'ai essayé de faire un truc, mais cela n'a pas marché. Je vous montre.
+    </p>
+
+    <div class="dev-code">
+      --contraste: <br>
+      oklch(from var(--bg)<br>
+      calc(clamp(0, (0.5 - l) * 1000, 1) * 0.97 + clamp(0, (l - 0.5) * 1000, 1) * 0.03) c h); <br>
+    </div>
+    <p>
+      Alors, c'est tordu. Il y a des <code>clamp()</code> pour faire en sorte que ça marche à la fois
+       pour les couleurs claires et les couleurs sombres.
+       En gros, le <code>clamp()</code> sert à limiter les valeurs dans une plage donnée (0 ou 1).
+       On multiplie par 0.97 pour les couleurs sombres et par 0.03 pour les couleurs claires 
+       pour faire en sorte que le contraste ne soit pas trop fort.
+       <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Mais ça ne marche pas.</mark><br>
+       Je crois que le moteur de calcule panique. Le navigateur n'arrive pas à 
+       prendre la valeur <code>l</code> de la variable <code>--bg</code> pour faire les calculs.
+       En gros cela aurait permis d'avoir une variable de contraste qui s'adapte automatiquement
+       à la luminosité de la couleur de fond. Peut-être qu'un jour on aura des <code>if</code>
+       dans le css ?
+       
+    </p>
+    </section>
+
+    <section class="doc-section">
+      <h2>La Check List Officielle</h2>
+      <p>
+        Voilà exactement comment je construis maintenant tous mes thèmes. Dans cet ordre.
+        Pas un pas de plus. Pas un pas de moins.
+      </p>
+
+      <div class="checklist-item">
+        <span class="checklist-number">1</span>
+        <div>
+          <h3>Choisis UN SEUL chiffre</h3>
+          <p>C'est ton Hue. Juste un nombre entre 0 et 360. C'est toute l'identité de ton thème. Tout le reste en dérive. Moi c'est 330. Tu peux mettre ce que tu veux.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">2</span>
+        <div>
+          <h3>Définis 3 niveaux de luminosité</h3>
+          <p>85% pour les actions, 50% pour les ombres, 15% pour les fonds sombres. Pas besoin de 12 niveaux. Personne ne voit la différence.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">3</span>
+        <div>
+          <h3>Définis 2 niveaux de chroma</h3>
+          <p>0.35 pour le neon qui pète les yeux, 0.05 pour les éléments neutres. C'est tout.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">4</span>
+        <div>
+          <h3>Ecris la règle de contraste</h3>
+          <p>Une seule ligne. Tu l'écris une fois dans ta vie et tu ne la touches plus jamais.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">5</span>
+        <div>
+          <h3>Tous les états en une ligne</h3>
+          <p><code>:hover</code> ? Tu baisses la luminosité de 10%. <br>
+            <code>:active</code> ? Tu baisse de 20%. <br>
+            <code>:disabled</code> ? Tu met la chroma à 0.02.<br>
+            C'est tout. Jamais tu ne redéfinis de couleur.
+            Sauf pour des objects très ponctuel comme on l'a vu avec le svg.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section">
+      <h2>Les inconvénients</h2>
+      <p>
+        Il faut être honnête. Ce système n'est pas pour tout le monde.
+      </p>
+      <p>
+        Si tu es un ou une graphiste qui aime passer du temps à choisir 
+        la teinte exacte de bleu qui va bien, les contours par thématiques,
+        les petits détails de reflet, ce système est moins... organique?
+         C'est plus pour avoir "le moins possible".
+         Il n'y a plus les 10 couleurs selon les contextes.
+         Il y a juste des règles qui marchent.
+    </p>
+    <p>
+        Personnellement, je n'ai plus trop envie d'avoir 10 nuances, des dégradés, des animations d'objects ou des fioritures. <br>
+        Je veux juste que ça marche. <br>
+        Je veux juste que ça soit accessible. <br>
+        Je veux juste que ça soit facile à maintenir. <br>
+        Je veux juste que ça soit facile à faire évoluer. <br>
+        Je veux juste que ça soit facile à faire varier pour les utilisateurices.
+    </p>
+    <p> 
+        Si tu es un.e développeureuse qui aime faire du pixel perfect, ce système est moins... complexe? Tu ne peux plus dire "ce bouton doit être exactement à 45° de ton bleu de base". Tu dois juste dire "ce bouton doit être dans la même teinte que le bleu de base". C'est plus pour avoir "le mieux possible". Il y a juste des règles qui fonctionnent.    
+</p>
+      <p>
+        Tu perds le lien avec le design à l'ancienne ou avec le design professionnalisé.
+        Tu gagnes un thème qui ne casse pas. Surtout si un jour on a des <code>if</code>.
+      </p>
+      <p>
+        Perso, comme je ne suis pas graphiste et que je ne suis pas doué avec les couleurs.
+        Je trouve plus simple.<br>
+        Alors attention, je ne dis pas qu'on ne peut pas faire de beaux thèmes 
+        très complexes. Juste que ce n'est pas tellement mon objectif. C'est le LAB quoi :D
+      </p>
+    </section>
+
+    <footer>
+     <p class="footer-credit">
+      Apprenti sorcier Mous_tik
+      <br>
+      <a href="./index.html">← Retour au laboratoire</a>
+     </p>
+    </footer>
+  </div>
+ </body>
+</html>

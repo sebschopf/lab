@@ -1,7 +1,7 @@
 /* ==========================================================================
    LAB OKLCH BRUTALISTE
    style.css | Thème principal
-   Version 1.0 | 14/04/2026
+   Version 1.1 | 14/04/2026
    ========================================================================== */
 
 /* #region VARIABLES */
@@ -19,9 +19,49 @@
 
  /* Thème Brutaliste : Contrastes extrêmes, noir et blanc purs */
  --clr-bg: oklch(97% 0.01 90); /* Presque blanc / papier grisâtre */
- --clr-surface: oklch(100% 0 0); /* Blanc pur les graphistes vont hurler :) */
+ --clr-surface: oklch(100% 0 0); /* Blanc pur les graphistes hurlent :) */
  --clr-text: oklch(0% 0 0); /* Noir pur les graphistes meurent */
-    --clr-border: oklch(0% 0 0); /* Bordures noires */
+ --clr-border: oklch(0% 0 0); /* Bordures noires */
+
+}
+/* #endregion */
+
+
+/* #region CHECKLIST CONTRASTE */
+.checklist-item {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid oklch(from var(--clr-border) l c h / 0.2);
+}
+
+.checklist-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.checklist-number {
+  background: var(--clr-brand);
+  border: 3px solid var(--clr-border);
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 4px 4px 0 var(--clr-border);
+}
+
+.checklist-item h3 {
+  font-family: monospace;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
 }
 /* #endregion */
 
@@ -204,6 +244,7 @@ mark.highlight {
 }
 
 .color-swatch {
+ position:relative;
  height: 150px;
  display: flex;
  align-items: flex-start;
@@ -212,6 +253,23 @@ mark.highlight {
  font-weight: 900;
  font-size: 1.2rem;
  border-bottom: 4px solid var(--clr-border);
+ position: relative;
+ /* La couleur de fond de la carte est définie par la variable --bg, qui est calculée dans les classes spécifiques (base, analogous, complementary, triadic) */
+  background-color: var(--bg);
+  /* chroma d'accentuation pour les composants */
+ --clr-accent-1: oklch(from var(--bg) calc(l - 0.4) c h );
+ --clr-accent-2: oklch(from var(--bg) calc(l - 0.6) c h );
+ --clr-accent-3: oklch(from var(--bg) calc(l - 0.8) c h );
+}
+.color-swatch svg {
+  position: absolute;
+  /* Centrage automatique dans le parent .color-swatch */
+  top: 60%; 
+  left: 70%;
+  transform: translate(-50%, -50%); 
+  width: 70px;
+  height: 70px;
+  pointer-events: none;
 }
 
 .color-swatch span {
@@ -241,22 +299,22 @@ mark.highlight {
 
 /* Génération des couleurs avec from et calc() */
 .swatch-base {
- background: var(--clr-brand);
+ --bg: var(--clr-brand);
 }
 
 .swatch-analogous {
  /* On décale la teinte de 45 degrés pour une couleur "voisine" */
- background: oklch(from var(--clr-brand) l c calc(h + 45));
+ --bg: oklch(from var(--clr-brand) l c calc(h + 45));
 }
 
 .swatch-complementary {
  /* On décale de 180 degrés pour l'opposé parfait */
- background: oklch(from var(--clr-brand) l c calc(h + 180));
+ --bg: oklch(from var(--clr-brand) l c calc(h + 180));
 }
 
 .swatch-triadic {
  /* On décale de -120 degrés pour une triade */
- background: oklch(from var(--clr-brand) l c calc(h - 120));
+ --bg: oklch(from var(--clr-brand) l c calc(h - 120));
 }
 
 /* #endregion */
