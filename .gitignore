@@ -1,0 +1,22 @@
+b# Fichiers locaux ignorés du dépôt
+WORKLOG.md
+TYPOGRAPHIE.md
+STYLE-ORGANISATION.md
+CHARTE.md
+NOTES.md
+.temp/
+*.local
+node_modules/
+.DS_Store
+ADR/
+.idea/
+.vscode/
+*.log
+*.tmp
+*.bak
+*.env
+*.env.local
+*.env.development
+*.env.test
+*.env.production
+

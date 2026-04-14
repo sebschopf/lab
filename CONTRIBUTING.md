@@ -1,11 +1,11 @@
 # Règles du projet
 
 > Ce fichier est la loi. Tout ce qui est écrit ici s'applique systématiquement.
-> Il sera lu systématiquement avant toute modification.
+> Il doit être lu systématiquement avant toute modification.
 
 ---
 
-##  Règles absolues
+## Règles absolues
 
 | Règle                                                    | Valeur                                         |
 |----------------------------------------------------------|------------------------------------------------|
@@ -21,7 +21,7 @@
 
 ---
 
-##  Organisation des fichiers
+## Organisation des fichiers
 
 | Fichier            | Règles                                                 |
 |--------------------|--------------------------------------------------------|
@@ -31,7 +31,7 @@
 
 ---
 
-## 📝 Conventions
+## Conventions
 
 - `kebab-case` uniquement pour les classes
 - Séparation stricte forme / couleur

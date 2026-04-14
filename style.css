@@ -234,7 +234,7 @@ mark.highlight {
  margin-top: 0.5rem;
  background: oklch(from var(--clr-analogue) l c h / 0.1);
  /*tu as vu le trick ici ? j'ai joué sur la transparence entre 0 et 1*/
- padding: 0.3rem;
+ color: oklch(from var(--clr-analogue) l 0.2 h);
  border: 1px solid var(--clr-border);
  font-family: monospace;
 }
