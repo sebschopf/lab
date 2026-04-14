@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Le rythme unique. Typographie, espacements, états. Pas 12 niveaux. 3 variables.">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <title>Le Rythme Unique | Lab OKLCH</title>
+ </head>
+ <body>
+  <div class="container">
+    <header>
+     <h1>Le Rythme Unique</h1>
+     <p>7 variables. Rien de plus.<br>
+        Pas de système de design. Juste des règles.</p>
+    </header>
+
+    <section class="doc-section">
+     <h2>Le problème</h2>
+     <p>
+      Tout le monde fait la même erreur.
+      On défini 12 tailles de police.
+      On défini 8 niveaux d'espacement.
+      On défini 6 états pour les boutons.
+      Puis personne ne s'en souvient.
+      Puis chacun met ce qu'il veut.
+      Puis ça devient le bordel.
+     </p>
+     <p>
+      Il n'y a aucune raison d'avoir 12 tailles de police.
+      Personne ne voit la différence entre 14px et 15px.
+      Personne ne sent la différence entre 28px et 32px.
+     </p>
+     <p>
+      Tu n'as besoin que de <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">3 valeurs</mark>.
+      C'est tout.
+     </p>
+
+     <div class="dev-code">
+:root {<br>
+  --step: 8px;<br>
+  --base: 1rem;<br>
+  --ratio: 1.25;<br>
+}
+     </div>
+
+     <p>
+      C'est tout. Tout le reste se calcule.
+      Tu ne définis plus jamais de valeur en dur.
+      Jamais.
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>1. Typographie</h2>
+     <p>
+      Pas de h1 à 3rem, h2 à 2.5rem, h3 à 2rem etc.
+      C'est stupide. C'est arbitraire.
+      Tu fais simplement une puissance du ratio.
+     </p>
+
+     <div class="dev-code">
+h1 { font-size: calc(var(--base) * pow(var(--ratio), 3)); }<br>
+h2 { font-size: calc(var(--base) * pow(var(--ratio), 2)); }<br>
+h3 { font-size: calc(var(--base) * pow(var(--ratio), 1)); }<br>
+small { font-size: calc(var(--base) * pow(var(--ratio), -1)); }
+     </div>
+
+     <p>
+      Si un jour tu trouves que c'est trop grand ou trop petit,
+      tu changes juste <code>--ratio</code> de 0.05.
+      Tout le site s'ajuste proportionnellement.
+      Rien ne casse. Rien ne se déphase.
+     </p>
+
+     <p>
+      Tu ne te poses plus jamais la question.
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>2. Espacements</h2>
+     <p>
+      Même principe.
+      Pas de mt-1, mt-2, mt-3 jusqu'à mt-12.
+      Pas de 4px, 8px, 12px, 16px, 20px, 24px, 32px.
+      Juste des multiples.
+     </p>
+
+     <div class="dev-code">
+--s-1: calc(var(--step) * 1);<br>
+--s-2: calc(var(--step) * 2);<br>
+--s-3: calc(var(--step) * 4);<br>
+--s-4: calc(var(--step) * 8);
+     </div>
+
+     <p>
+      C'est tout. 4 niveaux. Pas plus.
+      Tu ne peux pas faire de marge de 12px.
+      Tu ne peux pas faire de padding de 20px.
+      Tu choisis entre 16px et 32px.
+     </p>
+     <p>
+      Au début ça paraît dur.
+      Puis tu réalises que personne ne s'en rend compte.
+      Par contre tout le monde sent que c'est cohérent.
+     </p>
+
+     <p>
+      <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Le truc magique :</mark>
+      Si tu changes <code>--step</code> de 8px à 6px,
+      tout le site respire plus.
+      Si tu le passes à 10px, tout devient plus solide.
+      Tu changes UNE SEULE VALEUR.
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>3. Tous les états en 3 règles</h2>
+     <p>
+      Tu ne définis jamais de nouvelle couleur pour un état.
+      Jamais.
+      Tu ne fais que modifier la luminosité et la chroma.
+     </p>
+
+     <div class="dev-code">
+button:hover {<br>
+  background: oklch(from var(--clr-brand) calc(l - 0.1) c h);<br>
+}<br><br>
+button:active {<br>
+  background: oklch(from var(--clr-brand) calc(l - 0.2) c h);<br>
+  transform: translate(2px, 2px);<br>
+}<br><br>
+button:disabled {<br>
+  background: oklch(from var(--clr-brand) l 0.05 h);<br>
+}
+     </div>
+
+     <p>
+      C'est tout.
+      Ça marche pour n'importe quelle couleur de base.
+      Ça marche en thème clair comme en thème sombre.
+      Tu ne l'écris qu'une seule fois dans ta vie.
+     </p>
+
+     <div class="brutal-container">
+      <button type="button" class="brutal-button">Normal</button>
+      <button type="button" class="brutal-button" disabled>Désactivé</button>
+     </div>
+
+     <p>
+      Pas de transition douce.
+      Pas de ease-in-out de 300ms.
+      C'est immédiat.
+      C'est honnête.
+      L'utilisateur sait exactement quand il a cliqué.
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>La checklist</h2>
+
+     <div class="checklist-item">
+      <span class="checklist-number">1</span>
+      <div>
+       <h3>Choisis ton step</h3>
+       <p>8px c'est bien. 6px c'est plus aérien. 10px c'est plus brutal. Pas autre chose.</p>
+      </div>
+     </div>
+
+     <div class="checklist-item">
+      <span class="checklist-number">2</span>
+      <div>
+       <h3>Choisis ton ratio</h3>
+       <p>1.2 est discret. 1.25 est parfait. 1.33 c'est dramatique. Pas autre chose.</p>
+      </div>
+     </div>
+
+     <div class="checklist-item">
+      <span class="checklist-number">3</span>
+      <div>
+       <h3>Jamais de valeur en dur</h3>
+       <p>Si tu écris un nombre qui n'est pas un multiple, tu as perdu.</p>
+      </div>
+     </div>
+
+    </section>
+
+    <section class="doc-section">
+     <h2>Les inconvénients</h2>
+     <p>
+      Il faut être honnête. Ce système a un défaut majeur :
+     </p>
+     <p>
+      Tu ne peux plus faire de pixel perfect.
+      Tu ne peux plus reproduire exactement la maquette du graphiste.
+      Tu ne peux plus mettre cette marge de 17px que quelqu'un a décidé pour une raison inconnue.
+     </p>
+     <p>
+      Et c'est précisément pourquoi c'est mieux.
+     </p>
+    </section>
+
+    <footer>
+      <p class="footer-credit">
+       Apprenti sorcier Mous_tik
+       <br>
+       Big thanks à Christian Diaz pour l'inspiration!
+        <a href="https://la-cascade.io/articles/oklch-e" rel="noopener noreferrer" target="_blank">
+         son article de blog
+        </a>
+      </p>
+
+        <div class="grid">
+        <a href="./lab/contrast.html">
+         Le contraste automatique
+        </a>
+        <a href="./lab/index.html">
+         OKLCH, c'est quoi ?
+        </a>
+        <a href="./lab/grille.html">
+         La grille magique
+        </a>
+        </div>
+   </footer>
+  </div>
+ </body>
+</html>
