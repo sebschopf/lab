@@ -5,10 +5,12 @@
    ========================================================================== */
 
 /* #region VARIABLES */
+
+/* #region OKLCH */
 :root {
- /* Notre ADN de couleur - Un rose acide très brutal, agressif*/
+ /* Notre ADN de couleur - Un rose acide très brutal, agressif */
  --h-brand: 330;
- --l-action: 85%; /* moi j'aime bien, mais à 65% c'est pas mal*/
+ --l-action: 85%; /* moi j'aime bien, mais à 65% c'est pas mal */
  --c-neon: 0.35; /* Très saturé (vibrant) */
 
  /* Le Token Principal */
@@ -17,13 +19,15 @@
  --clr-complementaire: oklch(from var(--clr-brand) l c calc(h + 180));
  --clr-triadique: oklch(from var(--clr-brand) l c calc(h + 210));
 
-  /* Thème Brutaliste : Contrastes extrêmes, noir et blanc purs */
-  --clr-bg: oklch(97% 0.01 90); /* Presque blanc / papier grisâtre */
-  --clr-surface: oklch(100% 0 0); /* Blanc pur les graphistes hurlent :) */
-  --clr-text: oklch(0% 0 0); /* Noir pur les graphistes meurent */
-  --clr-border: oklch(0% 0 0); /* Bordures noires */
+/* Thème Brutaliste : Contrastes extrêmes, noir et blanc purs */
+  --clr-bg: oklch(97% 0.01 90deg); /* Presque blanc / papier grisâtre */
+  --clr-surface: oklch(100% 0 0deg); /* Blanc pur les graphistes hurlent :) */
+  --clr-text: oklch(0% 0 0deg); /* Noir pur les graphistes meurent */
+  --clr-border: oklch(0% 0 0deg); /* Bordures noires */
 
-  /* #region RYTHME */
+/* #endregion */
+
+/* #region RYTHME */
   --step: 8px;
 
   --s-1: calc(var(--step) * 1);
@@ -33,11 +37,14 @@
 
   --base: 1rem;
   --ratio: 1.25;
+
   /* #endregion */
 }
+
 /* #endregion */
 
 /* #region GRILLE */
+
 .grid {
   display: flex;
   flex-wrap: wrap;
@@ -52,10 +59,11 @@
   border: 3px solid var(--clr-border);
   padding: var(--s-3);
 }
+
 /* #endregion */
 
-
 /* #region CHECKLIST CONTRASTE */
+
 .checklist-item {
   display: flex;
   gap: var(--s-3);
@@ -95,9 +103,11 @@ small { font-size: calc(var(--base) * pow(var(--ratio), -1)); }
   margin-bottom: var(--s-1);
   text-transform: uppercase;
 }
+
 /* #endregion */
 
 /* #region ACCESSIBILITE */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -116,9 +126,11 @@ small { font-size: calc(var(--base) * pow(var(--ratio), -1)); }
 /* #endregion */
 
 /* #region STYLES GLOBAUX (RAW & ROUGH) */
+
 /* ============================================================
     STYLES GLOBAUX (RAW & ROUGH)
   ============================================================ */
+
 * {
  box-sizing: border-box;
  margin: 0;
@@ -211,6 +223,7 @@ code {
   color:oklch(from var(--clr-brand) l 0.04 h);
   padding: calc(var(--s-1) /1.7); 
 }
+
 footer {
  border: 5px solid var(--clr-analogue);
  background: var(--clr-text);
@@ -253,13 +266,17 @@ mark.highlight {
  font-weight: bold;
  text-transform: uppercase;
 }
+
 /* #endregion */
 
 /* #region COMPOSANTS */
+
 /* #region MULTI-TEINTES */
+
 /* ============================================================
     COMPOSANTS : PALETTE MULTI-TEINTES (CARTES BRUTES)
   ============================================================ */
+
 .palette-grid {
   gap: var(--s-4);
   margin: var(--s-4) 0;
@@ -286,16 +303,22 @@ mark.highlight {
  font-size: calc(var(--base) * pow(var(--ratio), 1));
  border-bottom: 4px solid var(--clr-border);
  position: relative;
- /* La couleur de fond de la carte est définie par la variable --bg, qui est calculée dans les classes spécifiques (base, analogous, complementary, triadic) */
+
+/* La couleur de fond de la carte est définie par la variable --bg,
+  qui est calculée dans les classes spécifiques
+  (base, analogous, complementary, triadic) */
   background-color: var(--bg);
-  /* chroma d'accentuation pour les composants */
+
+/* chroma d'accentuation pour les composants */
  --clr-accent-1: oklch(from var(--bg) calc(l - 0.4) c h );
  --clr-accent-2: oklch(from var(--bg) calc(l - 0.6) c h );
  --clr-accent-3: oklch(from var(--bg) calc(l - 0.8) c h );
 }
+
 .color-swatch svg {
   position: absolute;
-  /* Centrage automatique dans le parent .color-swatch */
+
+/* Centrage automatique dans le parent .color-swatch */
   top: 60%; 
   left: 70%;
   transform: translate(-50%, -50%); 
@@ -305,8 +328,8 @@ mark.highlight {
 }
 
 .color-swatch span {
- /* Pour s'assurer que le texte est lisible peu importe la couleur, 
-     on met un fond noir sous le texte */
+/* Pour s'assurer que le texte est lisible peu importe la couleur, 
+  on met un fond noir sous le texte */
  background: var(--clr-text);
  color: var(--clr-surface);
  padding: var(--s-1) var(--s-2);
@@ -322,8 +345,9 @@ mark.highlight {
 .color-info code {
  display: block;
  margin-top: var(--s-1);
+
+  /* Regarde le trick ici ? j'ai joué sur la transparence entre 0 et 1 */
  background: oklch(from var(--clr-analogue) l c h / 0.1);
- /*tu as vu le trick ici ? j'ai joué sur la transparence entre 0 et 1*/
  color: oklch(from var(--clr-analogue) l 0.2 h);
  border: 1px solid var(--clr-border);
  font-family: monospace;
@@ -351,7 +375,8 @@ mark.highlight {
 
 /* #endregion */
 
-/* #region ANIMÉS*/
+/* #region ANIMÉS */
+
 /* ============================================================
     COMPOSANTS : ANIMATIONS BRUTALISTES (STRICTES ET DURES)
   ============================================================ */
@@ -401,11 +426,13 @@ mark.highlight {
   box-shadow: 5px 5px 0 var(--clr-border);
   transform: translate(0, 0);
  }
+
  50% {
   /* On déplace l'ombre et on l'assombrit brutalement avec OKLCH */
-  box-shadow: 10px 10px 0 oklch(from var(--clr-brand) 0.3 c h);
+  box-shadow: 10px 10px 0 oklch(from var(--clr-brand) 30% c h);
   transform: translate(-4px, -4px);
  }
+
  100% {
   box-shadow: 5px 5px 0 var(--clr-border);
   transform: translate(0, 0);
@@ -423,11 +450,14 @@ mark.highlight {
   background: oklch(from var(--clr-brand) l c calc(h + 0));
   color: var(--clr-text);
  }
+
  50% {
   background: oklch(from var(--clr-brand) l c calc(h + 180));
+
   /* Contraste opposé */
   color: var(--clr-surface);
  }
+
  100% {
   background: oklch(from var(--clr-brand) l c calc(h + 360));
   color: var(--clr-text);
@@ -436,19 +466,23 @@ mark.highlight {
 
 .btn-rgb {
  animation: brutal-rgb 0.2s steps(3) infinite;
+
  /* Stroboscope ultra rapide et saccadé */
 }
 
 /* #endregion */
 
 /* #region TRANSPARENCE BRUTALE */
+
 /* ============================================================
      COMPOSANTS : TRANSPARENCE BRUTALE (SECTION 3)
    ============================================================ */
+
 mark.highlight-fluo {
- background: oklch(from var(--clr-complementaire) l c h / 0.4);
+ background: oklch(from var(--clr-complementaire) l c h / 40%);
  padding: calc(var(--s-1) / 1.7) calc(var(--s-1) / 2);
  border: 2px solid var(--clr-text);
+
  /* Effet coup de marqueur superposé */
 }
 
@@ -475,7 +509,7 @@ mark.highlight-fluo {
 
 .block-alpha {
  /* Transparence à 70% pour écraser le bloc en dessous sans le cacher */
- background: oklch(from var(--clr-brand) l c h / 0.7);
+ background: oklch(from var(--clr-brand) l c h / 70%);
  color: var(--clr-surface);
  padding: var(--s-3);
  border: 4px solid var(--clr-border);
@@ -483,9 +517,11 @@ mark.highlight-fluo {
  top: var(--s-3);
  left: var(--s-3);
  z-index: 2;
+
  /* Un petit effet de mélange pour "salir" les couleurs façon imprimerie */
  mix-blend-mode: multiply;
 }
+
 /* #endregion */
 
 /* #endregion */
