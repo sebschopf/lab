@@ -118,7 +118,7 @@ small { font-size: calc(var(--base) * pow(var(--ratio), -1)); }
 
 @media (max-width: 600px) {
   :root {
-    --step: 6px;
+    --step: 4px;
   }
 }
 
