@@ -197,6 +197,20 @@ header p {
   padding: var(--s-1) var(--s-2);
 }
 
+nav {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-top: var(--s-3);
+
+}
+
+header nav a {
+  flex: 1 1 0;
+  min-width: min(100%, 180px);
+  text-align: center;
+}
+
 .doc-section {
  background: var(--clr-surface);
  padding: var(--s-4);
@@ -245,6 +259,7 @@ a {
  background: var(--clr-analogue);
  color: var(--clr-text);
 }
+
 
 .dev-code {
   background-color: var(--clr-text);
