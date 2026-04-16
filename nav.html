@@ -1,0 +1,230 @@
+---
+---
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <title>Le Cauchemar du NAV | Laboratoire Brutaliste OKLCH</title>
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Le Cauchemar du NAV</h1>
+      <p>Pourquoi la chose la plus logique du monde est impossible nativement sur le web</p>
+      {% include nav.html %}
+    </header>
+
+    <section class="doc-section">
+
+      <h2>Introduction</h2>
+
+      <p>
+        Bon. tu savais, toi, comment faire en sorte de charger juste une partie d'un contenu qui est commun à toutes les pages, et cela change automatiquement toutes les pages ?
+      </p>
+      <p>
+        Vous voyez ce que je veux dire ? J'ai un principe. Si le bout de code existe déjà plus de DEUX fois, on en fait un fichier à part et comme ça, on s'embête plus. C'est du bon sens. C'est l'informatique de base. Le fameux principe DRY (Don't Repeat Yourself).
+      </p>
+      <p>
+        J'ai naïvement testé ça. Bref... je vous explique pourquoi j'ai foiré et pourquoi cela foire. Accrochez-vous, on va aller plus loin dans la technique pour comprendre ce qu'est VRAIMENT un navigateur et comment fonctionne son moteur de rendu.
+      </p>
+
+    </section>
+
+    <section class="doc-section">
+
+      <h2>Les essais dans l'ordre</h2>
+
+      <h3>1. <code>object</code></h3>
+      <p>Celui là c'est le plus logique. On met :</p>
+
+      <div class="dev-code">
+        object data="./_includes/nav.html"<br>
+        /object
+      </div>
+
+      <p>
+        Ça charge le fichier. Ça s'affiche parfaitement. Les styles s'appliquent si ils sont à l'interieur du fichier. Tout est beau.
+      </p>
+      <p>
+        Jusqu'à ce que tu cliques sur un lien. Rien ne se passe.
+      </p>
+      <p>
+        Parce que le clic reste prisonnier à l'intérieur de l'object. Le navigateur crée ce qu'on appelle un <strong>Browsing Context</strong> séparé. C'est une frontière impénétrable en HTML pur (sans JS). Il ne peut pas changer l'URL de la page parente par défaut.
+      </p>
+
+      <h3>2. <code>template</code></h3>
+      <p>
+        Ok donc on essaye le template. C'est fait pour ça non ?
+      </p>
+      <p>
+        Non. La balise <code>&lt;template&gt;</code> ne fait rien toute seule. Le parseur du navigateur la lit, vérifie que le HTML est valide, mais crée un "DocumentFragment" inerte. Il ne le dessine pas à l'écran.
+      </p>
+      <p>
+        Pour l'utiliser tu dois écrire du Javascript : le sélectionner, le cloner, l'insérer dans le DOM actif. Tu viens d'inventer ton propre micro-framework client. Retour à la case départ.
+      </p>
+
+      <h3>3. <code>iframe</code></h3>
+      <p>
+        Pire que l'object. Même problème d'isolation de contexte (la fameuse politique Same-Origin et le cloisonnement de l'objet <code>Window</code>). En plus tu te bats avec le flux de la page : scrollbars, problèmes de hauteur fixe, CSS de la page parente qui ne traverse pas la frontière du DOM. C'est un enfer absolu.
+      </p>
+
+      <h3>4. fetch() + innerHTML</h3>
+      <p>
+        Là on passe dans le hack JS asynchrone :
+      </p>
+
+      <div class="dev-code">
+        fetch('./componant/nav.html')<br>
+          .then(r => r.text())<br>
+          .then(html => {<br>
+          &nbsp;&nbsp;document.querySelector('#nav').innerHTML = html<br>
+          })
+      </div>
+
+      <p>
+        Ça marche ! Ouaaai ! Super ! Le nav s'affiche.
+      </p>
+      <p>
+        Non. (j'ai mal à mon web) Tu viens de poignarder les performances de ta page. Ce code s'exécute au <strong>Run-Time</strong> (pendant la navigation), APRÈS que le navigateur ait téléchargé et analysé ta page initiale. Tu forces le navigateur à faire un deuxième voyage réseau (Network Request) pour aller chercher le menu, puis à recalculer tout l'affichage (Reflow/Repaint). C'est ce qui cause le "Flash of Unstyled Content" ou les sauts de page.
+      </p>
+
+      <h3>5. PHP</h3>
+      <p>
+        Ça marche parfaitement. Bien sûr. Il suffit de faire :
+      </p>
+
+      <div class="dev-code">
+        &lt;?php include 'nav.html'; ?&gt;
+      </div >
+
+       <p>
+        Magie. Mais le problème, c'est que ça demande un moteur d'exécution côté serveur (un serveur Apache/Nginx avec le module PHP). À chaque fois qu'un visiteur clique, le serveur doit "réfléchir", assembler la page en direct, et l'envoyer.
+      </p>
+      <p>
+        C'est lourd. C'est lent. Et surtout, sur des hébergements ultra-rapides et gratuits comme Github Pages, on ne sert que des fichiers statiques. Il n'y a pas de "cerveau" PHP derrière. Donc c'est mort.
+      </p>
+
+    </section>
+
+    <section class="doc-section">
+
+      <h2>La vérité technique : le moteur sous le capot</h2>
+
+      <p>
+        L'absence de <code>include</code> en HTML n'est pas un oubli. C'est un choix d'ingénierie fondamental lié à la façon dont un navigateur dessine une page web.
+      </p>
+
+      <h3>Le "Critical Rendering Path" (Le chemin critique)</h3>
+      <p>
+        Quand ton navigateur reçoit un fichier HTML, il lit le texte de haut en bas et construit un arbre mathématique : le <strong>DOM (Document Object Model)</strong>. Son but absolu est d'afficher le premier pixel à l'écran le plus vite possible.
+      </p>
+      <p>
+        Si une balise d'inclusion native existait, voici ce qu'il se passerait :
+      </p>
+      <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+        <li>Le navigateur lit la page.</li>
+        <li>Il tombe sur l'inclusion du menu. <strong>Il s'arrête (Parsing Blocking)</strong>.</li>
+        <li>Il ouvre une nouvelle connexion réseau pour télécharger <code>nav.html</code>.</li>
+        <li>Il attend. L'écran de l'utilisateur reste blanc.</li>
+        <li>Il reçoit le menu, l'analyse, puis reprend la lecture de la page principale.</li>
+      </ul>
+      <p>
+        C'est ce qu'on appelle la cascade réseau (<em>Network Waterfall</em>). C'est catastrophique pour les performances. Le HTML a été conçu pour structurer un document unique qui peut être parsé en streaming, d'une seule traite.
+      </p>
+
+      <h3>La distinction Build-Time vs Run-Time</h3>
+
+      <p>
+        La solution professionnelle à ce problème n'est pas de forcer le navigateur du visiteur (Run-Time) à faire le travail d'assemblage. La solution, c'est de le faire AVANT, sur la machine du développeur ou sur le serveur de déploiement (Build-Time).
+      </p>
+
+      <p>
+        C'est exactement ce que fait <strong>Jekyll</strong> (ou n'importe quel générateur statique comme Astro, Eleventy ou Hugo).
+      </p>
+
+      <div class="checklist-item">
+        <span class="checklist-number">1</span>
+        <div>
+         <h3>Le moteur de Templating (Liquid)</h3>
+         <p>Jekyll utilise un langage appelé Liquid. Quand tu écris <code>{%</code><code>include nav.html</code><code>%}</code>, ce n'est pas du HTML. 
+         C'est une instruction pour le compilateur de Jekyll.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">2</span>
+        <div>
+         <h3>La phase de Compilation (Build)</h3>
+         <p>Au moment où tu envoies ton code sur GitHub, un programme (écrit en Ruby pour Jekyll) s'allume. Il scanne tes fichiers, lit tes variables (le Front Matter), attrape le code de ton composant `nav.html`, et l'injecte littéralement dans le flux de texte de tes pages. Il "aplatit" ton architecture.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">3</span>
+        <div>
+         <h3>Le résultat Statique</h3>
+         <p>Le produit final de Jekyll est un bête dossier contenant des fichiers <code>.html</code> normaux. Le code dupliqué y est ! Mais c'est la machine qui l'a dupliqué pour toi.</p>
+        </div>
+      </div>
+
+      <p>
+        <strong>Bénéfice:</strong> Zéro consommation de ressources CPU côté serveur lors de la visite. Zéro javascript côté client. Le navigateur reçoit un fichier plat, l'avale d'un coup, et l'affiche instantanément. C'est l'essence même de la performance web brute.
+      </p>
+
+    </section>
+
+    <section class="doc-section">
+
+      <h2>Conclusion</h2>
+
+      <p>
+        L'inclusion de composants HTML natifs sans JS et sans perte de performance relève de la physique quantique web : c'est un paradoxe.
+      </p>
+      <p>
+        Donc voilà. Tu as trois choix architecturaux :
+      </p>
+      <ol style="margin-left: 2rem; margin-bottom: 1.5rem;">
+        <li><strong>La punition :</strong> Tu copies/colles ton nav dans toutes les pages manuellement.</li>
+        <li><strong>L'obésité client (Run-Time) :</strong> Tu ajoutes un framework Javascript (React, Vue) qui va surcharger le navigateur de ton visiteur pour faire l'assemblage.</li>
+        <li><strong>La construction technique (Build-Time) :</strong> Tu utilises un générateur statique comme Jekyll pour faire le sale boulot en amont, et tu livres de la vitesse de Buzz l'éclaire (vers l'inf... pardon).</li>
+      </ol>
+
+      <p>
+        Voilà c'est tout, à toi de regarder sur le web 
+        <ul>
+          <li>Run-Time</li>
+          <li>Build-Time</li>
+          <li>DOM et Parsing Blocking</li>
+          <li>Network Request (va sur Linkedin f12 onglet Network et f5... tu vas délirer)</li>
+          <li>Reflow/Repaint</li>
+        </ul>
+      </p>
+
+    </section>
+
+    <footer>
+      <p class="footer-credit">
+        Apprenti sorcier Mous_tik
+      </p>
+      <div class="grid">
+          <a href="./contrast.html">
+            Le contraste automatique
+          </a>
+          <a href="./rythme.html">
+          Le rythme unique
+          </a>
+          <a href="./index.html">
+            OKLCH, c'est quoi ?
+          </a>
+          <a href="./grille.html">
+            La grille magique
+          </a>
+          <a href="./nav.html">
+            Le cauchemar du nav
+        </div>
