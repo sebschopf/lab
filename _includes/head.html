@@ -1,12 +1,22 @@
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
-    <meta name="description" content="{{ page.subtitle }}">
-
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
 
     <title>{{ page.title }} | Lab OKLCH</title>
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    
+    <meta name="description" content="{{ page.subtitle }}">
+    <meta name="robots" content="index, follow, max-snippet:-1">
+    
+    <meta name="theme-color" content="#ff3399">
+    <meta name="theme-color" content="oklch(0.85 0.35 330)">
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+
+    <meta property="og:site_name" content="Lab OKLCH">
+    <meta property="og:title" content="{{ page.title }}">
+    <meta property="og:description" content="{{ page.subtitle }}">
+    <meta property="og:type" content="website">
 </head>
