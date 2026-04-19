@@ -1,0 +1,467 @@
+---
+---
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="La grille sans media queries. Aucun breakpoint. Juste min() et flex-wrap.">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <title>La Grille Magique | Lab OKLCH</title>
+
+ </head>
+ <body>
+  <div class="container">
+    <header>
+     <h1>La Grille Magique</h1>
+     <p>Aucun breakpoint. beaucoup moins de media query.<br>
+        Ça marche sur tous les écrans.
+      </p>
+      {% include nav.html %}
+    </header>
+
+    <section class="doc-section">
+     <h2>Personne ne sait que ça existe</h2>
+     <p>
+      Tout le monde est encore en mode hacking stuff.
+      On écrit 500 lignes de CSS grid (oui oui je le pense vraiment).
+      On défini 7 breakpoints.
+      On test sur 12 tailles d'écran.
+      Et c'est toujours cassé quelque part.
+     </p>
+     <p>
+      Il y a une autre façon.
+      Ça tient en <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">1 ligne</mark>.
+      Ça marche sur téléphone, tablette, ordinateur, télévision, frigo connecté.
+      Tu ne l'écris qu'une fois.
+      Et tu n'y touches plus jamais.
+     </p>
+
+     <div class="dev-code">
+flex: 1 1 min(100%, 260px);
+     </div>
+
+     <p>
+      C'est tout.
+      C'est la ligne la plus puissante du CSS.
+      Et personne ne l'utilise.
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>Démonstration</h2>
+     <p>
+      Redimensionne la fenêtre.
+      Essaye sur téléphone.
+      Essaye sur un écran 4k.
+      Ça s'adapte tout seul.
+      Pas de code supplémentaire.
+     </p>
+
+     <h3>Cartes avec contenu réel</h3>
+     <div class="grid">
+      <div class="demo-card">
+        <h4>Titre carte 1</h4>
+        <p>Ceci est un contenu normal qui tient dans une carte. Ça marche avec n'importe quelle hauteur.</p>
+      </div>
+      <div class="demo-card">
+        <h4>Titre carte 2</h4>
+        <p>Une carte avec plus de contenu. Ça s'adapte automatiquement. Toutes les cartes gardent la même hauteur.</p>
+        <p>Et même avec plusieurs paragraphes.</p>
+      </div>
+      <div class="demo-card">
+        <h4>Titre carte 3</h4>
+        <p>Petite carte.</p>
+      </div>
+      <div class="demo-card">
+        <h4>Titre carte 4</h4>
+        <p>Ceci est un contenu normal qui tient dans une carte. Ça marche avec n'importe quelle hauteur.</p>
+      </div>
+      <div class="demo-card">
+        <h4>Titre carte 5</h4>
+        <p>Une carte avec plus de contenu. Ça s'adapte automatiquement.</p>
+      </div>
+      <div class="demo-card">
+        <h4>Titre carte 6</h4>
+        <p>Dernière carte.</p>
+      </div>
+     </div>
+
+     <h3 style="margin-top: 4rem;">Et si tu veux changer l'espacement ?</h3>
+
+     <p>Tu ne changes rien d'autre que le gap. C'est tout.</p>
+
+     <div class="dev-code">
+gap: var(--s-2); /* 16px */<br>
+gap: var(--s-3); /* 32px */<br>
+gap: var(--s-4); /* 64px */
+     </div>
+
+     <h4>Démonstration gap 16px</h4>
+     <div class="grid" style="gap: var(--s-2);">
+      <div class="demo-card">1</div>
+      <div class="demo-card">2</div>
+      <div class="demo-card">3</div>
+      <div class="demo-card">4</div>
+     </div>
+
+     <h4 style="margin-top: 2rem;">Démonstration gap 64px</h4>
+     <div class="grid" style="gap: var(--s-4);">
+      <div class="demo-card">1</div>
+      <div class="demo-card">2</div>
+      <div class="demo-card">3</div>
+      <div class="demo-card">4</div>
+     </div>
+
+     <h3 style="margin-top: 4rem;">Et avec tes cartes à couleurs ?</h3>
+
+     <p>Ça marche aussi évidemment. La même règle s'applique à n'importe quel élément.</p>
+
+     <div class="palette-grid grid">
+      <div class="color-card">
+        <div class="color-swatch swatch-base">
+          <span>BASE</span>
+        </div>
+        <div class="color-info">
+          Ça marche
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch swatch-analogous">
+          <span>ANALOGUE</span>
+        </div>
+        <div class="color-info">
+          avec absolument
+        </div>
+      </div>
+      <div class="color-card" style="flex: 1 1 min(100%, 180px);">
+        <div class="color-swatch swatch-complementary">
+          <span>COMPLÉMENT</span>
+        </div>
+        <div class="color-info">
+          tous tes
+        </div>
+      </div>
+      <div class="color-card" style="flex: 1 1 min(100%, 180px);">
+        <div class="color-swatch swatch-triadic">
+          <span>TRIADIQUE</span>
+        </div>
+        <div class="color-info">
+          composants
+        </div>
+      </div>
+     </div>
+
+     <p>
+      Aucune modification. Tu ajoutes juste <code>flex: 1 1 min(100%, 180px);</code> sur tes éléments existants. C'est tout.
+     </p>
+
+     <p>
+      Ça met automatiquement le bon nombre de cartes par ligne.
+      Si l'écran est petit : 1 colonne.
+      Moyen : 2 colonnes.
+      Grand : 3 colonnes.
+      Très grand : 4, 5, 6 colonnes.
+     </p>
+     <p>
+      Tu n'as rien à faire.
+      Le navigateur calcule.
+      Il sait mieux que toi combien de cartes ça tient.
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>Le code final complet</h2>
+
+     <p>
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Accroche toi un peu, je sais que je n'explique pas toujours très bien.
+     Mais je pense que quand c'est compris, la magie opère vraiment.</mark>
+     </p>
+     <p>
+      Pas d'imagination. Pas de truc caché. Voilà exactement ce que tu écris.
+      Tout. Pas plus.
+     </p>
+
+     <p>
+      D'abord les variables de base. Tu les as déjà définies sur <a href="./rythme.html" style="opacity: 0.7">la page rythme</a>.
+      Ce sont exactement les mêmes. Rien de nouveau.
+     </p>
+
+     <div class="dev-code">
+      :root {<br><br>
+      /* #region OKLCH */<br>
+      --h-brand: 330;<br>
+      --l-action: 85%;<br>
+      --c-neon: 0.35;<br><br>
+      --clr-brand: oklch(var(--l-action) var(--c-neon) var(--h-brand));<br>
+      --clr-analogue: oklch(from var(--clr-brand) l c calc(h + 45));<br>
+      --clr-complementaire: oklch(from var(--clr-brand) l c calc(h + 180));<br>
+      --clr-triadique: oklch(from var(--clr-brand) l c calc(h + 210));<br><br>
+      --clr-bg: oklch(97% 0.01 90);<br>
+      --clr-surface: oklch(100% 0 0);<br>
+      --clr-text: oklch(0% 0 0);<br>
+      --clr-border: oklch(0% 0 0);<br>
+      /* #endregion */<br><br>
+      /* #region RYTHME */<br>
+      --step: 8px;<br><br>
+      --s-1: calc(var(--step) * 1);<br>
+      --s-2: calc(var(--step) * 2);<br>
+      --s-3: calc(var(--step) * 4);<br>
+      --s-4: calc(var(--step) * 8);<br><br>
+      --base: 1rem;<br>
+      --ratio: 1.25;<br>
+      /* #endregion */<br><br>
+      /* #region GRILLE */<br>
+      display: flex;<br>
+      flex-wrap: wrap;<br>
+      gap: var(--s-3);<br><br>
+      .grid > * {<br>
+      flex: 1 1 min(100%, 260px);<br>
+      }<br>
+      }<br><br>
+      /* #endregion */<br>
+     </div>
+
+     <p>Ensuite la grille. Deux sélecteurs. Cinq lignes au total.</p>
+
+     <div class="dev-code">
+      .grid {<br>
+      display: flex;   /* passe en mode flexible */<br>
+      flex-wrap: wrap; /* met à la ligne automatiquement */<br>
+      gap: var(--s-3); /* espace entre les éléments */<br>
+      }<br><br>
+      .grid > * {<br>
+      /* s'applique à TOUS les enfants directement. Pas besoin de classe */<br>
+      flex: 1 1 min(100%, 260px);<br>
+      }<br>
+     </div>
+
+     <p>Tu écris ça une seule fois dans ton fichier CSS principal.</p>
+
+     <p>Et ensuite dans ton HTML :</p>
+
+     <div class="dev-code">
+      section class="grid" qui a la définition gap: var(--s-3)"<br>
+        div class="color-card">...<br>
+        div class="color-card">...<br>
+        div class="color-card">...<br>
+        div class="color-card">...<br>
+      /section
+     </div>
+
+     <p>
+      Tu ajoutes la classe <code>grid</code> sur le conteneur.
+      C'est tout.
+      Tu ne changes rien aux éléments à l'intérieur.
+      Tu ne changes rien à tes composants existants.
+      Ça marche avec absolument tout.
+     </p>
+
+     <p>
+      C'est fini.<br>
+      Ça marche sur tous les écrans.<br>
+      Ça marche avec n'importe quel contenu.<br>
+      Ça marche avec les cartes <a href="./contrast.html" style="opacity: 0.7">de la page contraste</a>.<br>
+      Ça marche avec des boutons.<br>
+      Ça marche avec des images.<br>
+      Tu n'écris plus jamais de CSS de grille.
+     </p>
+
+     <h3>Hiérarchie et ordre</h3>
+
+     <div class="checklist-item">
+      <span class="checklist-number">1</span>
+      <div>
+       <h3>Le conteneur</h3>
+       <p><code>display: flex</code> passe en mode flexible. <code>flex-wrap: wrap</code> dit que les éléments vont à la ligne quand il n'y a plus la place. <code>gap</code> c'est l'espace entre les éléments.</p>
+      </div>
+     </div>
+
+     <div class="checklist-item">
+      <span class="checklist-number">2</span>
+      <div>
+       <h3>Les enfants</h3>
+       <p>La règle s'applique à TOUS les enfants directement. Pas besoin de classe sur les éléments. Pas besoin de rien. Tu met ce que tu veux dedans.</p>
+      </div>
+     </div>
+
+     <h3>Les réglages</h3>
+
+     <p>Il n'y a que DEUX valeurs que tu peux changer. Pas plus.</p>
+
+     <div class="dev-code">
+      gap: var(--s-1); /* 8px  - très serré */<br>
+      gap: var(--s-2); /* 16px - normal */<br>
+      gap: var(--s-3); /* 32px - confortable (j'aime bien) */<br>
+      gap: var(--s-4); /* 64px - aéré */
+     </div>
+
+     <div class="dev-code">
+      min(100%, 200px); /* petites cartes / icônes */<br>
+      min(100%, 260px); /* cartes normales (j'aime bien) */<br>
+      min(100%, 320px); /* contenu texte */<br>
+      min(100%, 400px); /* grandes cartes / images */
+     </div>
+
+     <p>
+      Ce sont les deux seuls curseurs.
+      Tu ne touches à rien d'autre.
+      Jamais.
+     </p>
+
+    </section>
+
+    <section class="doc-section">
+     <h2>Comment ça marche ?</h2>
+
+     <div class="dev-code">
+      display: flex;<br>
+      flex-wrap: wrap;<br>
+      gap: 32px;
+     </div>
+
+     <p>
+      D'abord on dit que les éléments vont à la ligne quand il n'y a plus la place.
+     </p>
+
+     <div class="dev-code">
+min(100%, 260px)
+     </div>
+
+     <p>
+      C'est le truc magique.
+      <code>min()</code> prend la plus petite valeur entre les deux.
+      Donc :
+     </p>
+     <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+       <li>Si il y a moins de 260px de place : prend 100%</li>
+       <li>Si il y a plus : prend 260px</li>
+     </ul>
+
+     <div class="dev-code">
+flex: 1 1 [valeur];
+     </div>
+
+     <p>
+      Et ensuite on dit :
+      "Tu peux grandir si il y a de la place.
+      Tu peux rétrécir si il n'y en a plus.
+      Mais tu ne descendras jamais en dessous de ce que j'ai dit."
+     </p>
+
+     <p>
+      C'est tout.
+      Pas de magie.
+      Juste du CSS qui existe depuis au moins avant les dinosaures (au moins je te dis!).
+     </p>
+    </section>
+
+     <section class="doc-section">
+      <h2>Pourquoi personne ne l'utilise ?</h2>
+      <p>
+       Parce que tout le monde a appris `display: grid`.
+       Parce que tous les tutos montrent les breakpoints (au début cela fait tricks de fou c'est vrai).
+       Parce que tous les frameworks font comme ça.
+       Parce que personne n'a pris 5 minutes pour lire la documentation de flexbox.
+      </p>
+      <p>
+       faire une grille = utiliser la propriété `display: grid`
+      </p>
+      <p>
+       Alors que c'est complètement faux. Une grille c'est juste des éléments alignés en lignes et colonnes. Ça existait 10 ans avant `display: grid`.
+      </p>
+      <p>
+       Le truc le plus drôle dans l'histoire: on ne fait pas de grille avec `display: grid`. On fait des tableaux. La vrai grille c'est ça. Celle là. Avec flex.
+      </p>
+     <p>
+      Il y a juste une limite :
+      ça ne marche pas si tu veux absolument toujours exactement 3 colonnes peu importe la taille de l'écran.
+     </p>
+     <p>
+      Mais si tu veux toujours exactement 3 colonnes même sur un écran de téléphone de 320px,
+      c'est que tu fais de la merde de toute façon (pardon mais c'est vrai à la fin quoi).
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>Les règles</h2>
+
+     <div class="checklist-item">
+      <span class="checklist-number">1</span>
+      <div>
+       <h3>Tu choisis une seule taille minimum</h3>
+       <p>260px c'est parfait pour des cartes. 320px c'est parfait pour du contenu. Pas autre chose.</p>
+      </div>
+     </div>
+
+     <div class="checklist-item">
+      <span class="checklist-number">2</span>
+      <div>
+       <h3>Jamais de largeur maximum</h3>
+       <p>Si il y a de la place, les éléments grandissent. C'est normal. C'est ce que veulent les utilisateurices.
+        A la limite pour le container moi j'ai mis une limite à 1200px pour l'accessibilité.
+       </p>
+      </div>
+     </div>
+
+     <div class="checklist-item">
+      <span class="checklist-number">3</span>
+      <div>
+       <h3>Jamais de <code>justify-content: center</code></h3>
+       <p>Si tu centres la dernière ligne est cassée. Laisse les éléments sur la gauche. C'est mieux contre les effets dyslexiques aussi.</p>
+      </div>
+     </div>
+
+    </section>
+
+    <section class="doc-section">
+     <h2>Conclusion</h2>
+     <p>
+      Tu peux supprimer beaucoup (tout?) du code CSS de tes grilles.
+      Tu peux supprimer tous tes media queries.
+      Tu peux supprimer Tailwind (bye bye presque copain).
+      Tu peux supprimer Bootstrap (de toute façon je t'ai jamais aimé).
+     </p>
+     <p>
+      Une ligne.
+      Ça marche partout.
+      Ça marchera toujours.
+     </p>
+     <p>
+      Et personne ne te dira merci.
+     </p>
+    </section>
+
+    <footer>
+      <p class="footer-credit">
+       Apprenti sorcier Mous_tik
+       <br>
+       Big thanks à Christian Diaz pour l'inspiration!
+        <a href="https://la-cascade.io/articles/oklch-e" rel="noopener noreferrer" target="_blank">
+         son article de blog
+        </a>
+      </p>
+
+     <div class="grid">
+          <a href="./contrast.html">
+            Le contraste automatique
+          </a>
+          <a href="./rythme.html">
+          Le rythme unique
+          </a>
+          <a href="./index.html">
+            OKLCH, c'est quoi ?
+          </a>
+          <a href="./grille.html">
+            La grille magique
+          </a>
+          <a href="./nav.html">
+            Le cauchemar du nav
+        </div>
+   </footer>
+  </div>
+ </body>
+</html>

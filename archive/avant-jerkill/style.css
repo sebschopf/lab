@@ -1,0 +1,548 @@
+/* ==========================================================================
+   LAB OKLCH BRUTALISTE
+   style.css | Thème principal
+   Version 2.0 | 15/04/2026
+   ========================================================================== */
+
+/* #region VARIABLES */
+
+/* #region OKLCH */
+:root {
+ /* Notre ADN de couleur - Un rose acide très brutal, agressif */
+ --h-brand: 330;
+ --l-action: 85%; /* moi j'aime bien, mais à 65% c'est pas mal */
+ --c-neon: 0.35; /* Très saturé (vibrant) */
+
+ /* Le Token Principal */
+ --clr-brand: oklch(var(--l-action) var(--c-neon) var(--h-brand));
+ --clr-analogue: oklch(from var(--clr-brand) l c calc(h + 45));
+ --clr-complementaire: oklch(from var(--clr-brand) l c calc(h + 180));
+ --clr-triadique: oklch(from var(--clr-brand) l c calc(h + 210));
+
+/* Thème Brutaliste : Contrastes extrêmes, noir et blanc purs */
+  --clr-bg: oklch(97% 0.01 90deg); /* Presque blanc / papier grisâtre */
+  --clr-surface: oklch(100% 0 0deg); /* Blanc pur les graphistes hurlent :) */
+  --clr-text: oklch(0% 0 0deg); /* Noir pur les graphistes meurent */
+  --clr-border: oklch(0% 0 0deg); /* Bordures noires */
+
+/* #endregion */
+
+/* #region RYTHME */
+  --step: 8px;
+
+  --s-1: calc(var(--step) * 1);
+  --s-2: calc(var(--step) * 2);
+  --s-3: calc(var(--step) * 4);
+  --s-4: calc(var(--step) * 8);
+
+  --base: 1rem;
+  --ratio: 1.25;
+
+  /* #endregion */
+}
+
+/* #endregion */
+
+/* #region GRILLE */
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+.grid > * {
+  flex: 1 1 min(100%, 260px);
+}
+
+.demo-card {
+  border: 3px solid var(--clr-border);
+  padding: var(--s-3);
+}
+
+/* #endregion */
+
+/* #region CHECKLIST CONTRASTE */
+
+.checklist-item {
+  display: flex;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+  padding-bottom: var(--s-4);
+  border-bottom: 4px solid oklch(from var(--clr-border) l c h );
+}
+
+.checklist-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.checklist-number {
+  background: var(--clr-brand);
+  border: 3px solid var(--clr-border);
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 4px 4px 0 var(--clr-border);
+}
+
+h1 { font-size: calc(var(--base) * pow(var(--ratio), 3)); }
+h2 { font-size: calc(var(--base) * pow(var(--ratio), 2)); }
+h3 { font-size: calc(var(--base) * pow(var(--ratio), 1)); }
+small { font-size: calc(var(--base) * pow(var(--ratio), -1)); }
+
+.checklist-item h3 {
+  font-family: monospace;
+  margin-bottom: var(--s-1);
+  text-transform: uppercase;
+}
+
+/* #endregion */
+
+/* #region ACCESSIBILITE */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --step: 4px;
+  }
+}
+
+@media (prefers-contrast: more) {
+  html { font-size: 120%; }
+}
+
+@media (prefers-contrast: less) {
+  html { font-weight: 500; }
+}
+/* #endregion */
+
+/* #region STYLES GLOBAUX (RAW & ROUGH) */
+
+/* ============================================================
+    STYLES GLOBAUX (RAW & ROUGH)
+  ============================================================ */
+
+* {
+ box-sizing: border-box;
+ margin: 0;
+ padding: 0;
+}
+
+body {
+ background-color: var(--clr-bg);
+ color: var(--clr-text);
+ /* Mix de polices système brutes */
+  font-family:
+    system-ui,
+    OpenDyslexic,
+    Dyslexie,
+    Readable,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+ line-height: calc(var(--ratio) + 0.55);
+ padding: 0 var(--s-1);
+ /* Trame de fond style "cahier" ou grille brute (optionnel) */
+ background-image: radial-gradient(var(--clr-text) 2px, transparent 1px);
+ background-size: var(--s-4) var(--s-4);
+}
+
+.container {
+ max-width: 80ch;
+ margin: 0 auto;
+}
+
+header {
+ text-align: left;
+ margin-bottom: var(--s-4);
+ border: 5px solid var(--clr-border);
+ background: var(--clr-brand);
+ padding: var(--s-4);
+ box-shadow: 15px 15px 0 var(--clr-border);
+}
+
+header h1 {
+ color: var(--clr-text);
+ font-family: "Courier New", Courier, monospace;
+ text-transform: uppercase;
+ font-weight: 900;
+ letter-spacing: 0;
+ line-height: 1;
+}
+
+header p {
+  font-size: calc(var(--base) * pow(var(--ratio), 1));
+  font-weight: bold;
+  margin-top: var(--s-2);
+  font-family: monospace;
+  background: var(--clr-text);
+  color: var(--clr-surface);
+  display: inline-block;
+  padding: var(--s-1) var(--s-2);
+}
+
+nav {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-top: var(--s-3);
+
+}
+
+header nav a {
+  flex: 1 1 0;
+  min-width: min(100%, 180px);
+  text-align: center;
+}
+
+.doc-section {
+ background: var(--clr-surface);
+ padding: var(--s-4);
+ border: 4px solid var(--clr-border);
+ /* PAS de border-radius dans le brutalisme (ou très léger) */
+ border-radius: 0;
+ margin-bottom: var(--s-4);
+ /* Ombre DURE (pas de blur) */
+ box-shadow: 12px 12px 0 var(--clr-border);
+}
+
+h2 {
+  font-family: "Courier New", Courier, monospace;
+  margin-bottom: var(--s-3);
+  color: var(--clr-text);
+  text-transform: uppercase;
+  border-bottom: 4px solid var(--clr-border);
+  padding-bottom: var(--s-2);
+  letter-spacing: 0;
+}
+
+p {
+  margin-bottom: var(--s-3);
+  font-size: var(--base);
+}
+
+code {
+  background-color:oklch(
+    from var(--clr-brand) calc(l - 0.6) calc(c - 0.3) h);
+  color:oklch(from var(--clr-brand) l 0.04 h);
+  padding: calc(var(--s-1) /1.7); 
+}
+
+footer {
+ border: 5px solid var(--clr-analogue);
+ background: var(--clr-text);
+ color: var(--clr-surface);
+ padding: var(--s-3);
+ box-shadow: 15px 15px 0 var(--clr-border);
+}
+
+a {
+ font-family: "Courier New", Courier, monospace;
+ font-weight: bold;
+ padding: 0.2rem 0.5rem;
+ background: var(--clr-analogue);
+ color: var(--clr-text);
+}
+
+
+.dev-code {
+  background-color: var(--clr-text);
+  color: oklch(
+   from var(--clr-brand) l 0.05 h
+  ); /* Texte code teinté avec l'ADN */
+  padding: var(--s-3);
+  font-family: "Courier New", Courier, monospace;
+  font-size: var(--base);
+  font-weight: bold;
+  margin: var(--s-3) 0;
+  border: 3px solid var(--clr-brand);
+  overflow-x: auto;
+}
+
+mark {
+  background: none;
+  color: inherit
+}
+
+mark.highlight {
+ background: var(--clr-brand);
+ color: var(--clr-text);
+ padding: calc(var(--s-1) / 1.7) calc(var(--s-1) / 2);
+ font-weight: bold;
+ text-transform: uppercase;
+}
+
+/* #endregion */
+
+/* #region COMPOSANTS */
+
+/* #region MULTI-TEINTES */
+
+/* ============================================================
+    COMPOSANTS : PALETTE MULTI-TEINTES (CARTES BRUTES)
+  ============================================================ */
+
+.palette-grid {
+  gap: var(--s-4);
+  margin: var(--s-4) 0;
+}
+
+.palette-grid > * {
+  flex: 1 1 min(100%, 180px);
+}
+
+.color-card {
+ background: var(--clr-surface);
+ border: 4px solid var(--clr-border);
+ box-shadow: 8px 8px 0 var(--clr-border);
+}
+
+.color-swatch {
+ position:relative;
+ height: 150px;
+ display: flex;
+ align-items: flex-start;
+ padding: var(--s-2);
+ font-family: monospace;
+ font-weight: 900;
+ font-size: calc(var(--base) * pow(var(--ratio), 1));
+ border-bottom: 4px solid var(--clr-border);
+ position: relative;
+
+/* La couleur de fond de la carte est définie par la variable --bg,
+  qui est calculée dans les classes spécifiques
+  (base, analogous, complementary, triadic) */
+  background-color: var(--bg);
+
+/* chroma d'accentuation pour les composants */
+ --clr-accent-1: oklch(from var(--bg) calc(l - 0.4) c h );
+ --clr-accent-2: oklch(from var(--bg) calc(l - 0.6) c h );
+ --clr-accent-3: oklch(from var(--bg) calc(l - 0.8) c h );
+}
+
+.color-swatch svg {
+  position: absolute;
+
+/* Centrage automatique dans le parent .color-swatch */
+  top: 60%; 
+  left: 70%;
+  transform: translate(-50%, -50%); 
+  width: 70px;
+  height: 70px;
+  pointer-events: none;
+}
+
+.color-swatch span {
+/* Pour s'assurer que le texte est lisible peu importe la couleur, 
+  on met un fond noir sous le texte */
+ background: var(--clr-text);
+ color: var(--clr-surface);
+ padding: var(--s-1) var(--s-2);
+ text-transform: uppercase;
+}
+
+.color-info {
+ padding: var(--s-2);
+ font-size: var(--base);
+ font-weight: bold;
+}
+
+.color-info code {
+ display: block;
+ margin-top: var(--s-1);
+
+  /* Regarde le trick ici ? j'ai joué sur la transparence entre 0 et 1 */
+ background: oklch(from var(--clr-analogue) l c h / 0.1);
+ color: oklch(from var(--clr-analogue) l 0.2 h);
+ border: 1px solid var(--clr-border);
+ font-family: monospace;
+}
+
+/* Génération des couleurs avec from et calc() */
+.swatch-base {
+ --bg: var(--clr-brand);
+}
+
+.swatch-analogous {
+ /* On décale la teinte de 45 degrés pour une couleur "voisine" */
+ --bg: oklch(from var(--clr-brand) l c calc(h + 45));
+}
+
+.swatch-complementary {
+ /* On décale de 180 degrés pour l'opposé parfait */
+ --bg: oklch(from var(--clr-brand) l c calc(h + 180));
+}
+
+.swatch-triadic {
+ /* On décale de -120 degrés pour une triade */
+ --bg: oklch(from var(--clr-brand) l c calc(h - 120));
+}
+
+/* #endregion */
+
+/* #region ANIMÉS */
+
+/* ============================================================
+    COMPOSANTS : ANIMATIONS BRUTALISTES (STRICTES ET DURES)
+  ============================================================ */
+.brutal-container {
+ display: flex;
+ justify-content: flex-start;
+ align-items: center;
+ padding: var(--s-4) 0;
+ gap: var(--s-4);
+ flex-wrap: wrap;
+}
+
+.brutal-button {
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  font-family: "Courier New", Courier, monospace;
+  font-size: calc(var(--base) * pow(var(--ratio), 1));
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: var(--s-2) var(--s-3);
+  cursor: pointer;
+  border: 4px solid var(--clr-border);
+  position: relative;
+  /* Ombre dure par défaut */
+  box-shadow: 6px 6px 0 oklch(from var(--clr-brand) 0.5 c h);
+}
+
+.brutal-button:hover {
+  background: oklch(from var(--clr-surface) calc(l - 0.1) c h);
+}
+
+.brutal-button:active {
+  background: oklch(from var(--clr-surface) calc(l - 0.2) c h);
+  transform: translate(5px, 5px);
+  box-shadow: 0px 0px 0 oklch(from var(--clr-brand) 0.4 c h);
+}
+
+.brutal-button:disabled {
+  background: oklch(from var(--clr-surface) l 0.05 h);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Animation 1 : Ombre Mécanique (Hard Pulse) */
+@keyframes hard-pulse {
+ 0% {
+  box-shadow: 5px 5px 0 var(--clr-border);
+  transform: translate(0, 0);
+ }
+
+ 50% {
+  /* On déplace l'ombre et on l'assombrit brutalement avec OKLCH */
+  box-shadow: 10px 10px 0 oklch(from var(--clr-brand) 30% c h);
+  transform: translate(-4px, -4px);
+ }
+
+ 100% {
+  box-shadow: 5px 5px 0 var(--clr-border);
+  transform: translate(0, 0);
+ }
+}
+
+.btn-mechanical {
+ animation: hard-pulse 2s steps(3) infinite;
+ /* steps(3) rend l'animation saccadée exprès */
+}
+
+/* Animation 2 : Stroboscope RGB */
+@keyframes brutal-rgb {
+ 0% {
+  background: oklch(from var(--clr-brand) l c calc(h + 0));
+  color: var(--clr-text);
+ }
+
+ 50% {
+  background: oklch(from var(--clr-brand) l c calc(h + 180));
+
+  /* Contraste opposé */
+  color: var(--clr-surface);
+ }
+
+ 100% {
+  background: oklch(from var(--clr-brand) l c calc(h + 360));
+  color: var(--clr-text);
+ }
+}
+
+.btn-rgb {
+ animation: brutal-rgb 0.2s steps(3) infinite;
+
+ /* Stroboscope ultra rapide et saccadé */
+}
+
+/* #endregion */
+
+/* #region TRANSPARENCE BRUTALE */
+
+/* ============================================================
+     COMPOSANTS : TRANSPARENCE BRUTALE (SECTION 3)
+   ============================================================ */
+
+mark.highlight-fluo {
+ background: oklch(from var(--clr-complementaire) l c h / 40%);
+ padding: calc(var(--s-1) / 1.7) calc(var(--s-1) / 2);
+ border: 2px solid var(--clr-text);
+
+ /* Effet coup de marqueur superposé */
+}
+
+.overlap-container {
+ position: relative;
+ height: 250px;
+ margin-top: var(--s-3);
+ font-family: "Courier New", Courier, monospace;
+ font-weight: 900;
+ font-size: calc(var(--base) * pow(var(--ratio), 2));
+}
+
+.block-solid {
+ background: var(--clr-analogue);
+ color: var(--clr-text);
+ padding: var(--s-3);
+ border: 4px solid var(--clr-border);
+ position: absolute;
+ top: 0;
+ left: 0;
+ z-index: 1;
+ box-shadow: 8px 8px 0 var(--clr-border);
+}
+
+.block-alpha {
+ /* Transparence à 70% pour écraser le bloc en dessous sans le cacher */
+ background: oklch(from var(--clr-brand) l c h / 70%);
+ color: var(--clr-surface);
+ padding: var(--s-3);
+ border: 4px solid var(--clr-border);
+ position: absolute;
+ top: var(--s-3);
+ left: var(--s-3);
+ z-index: 2;
+
+ /* Un petit effet de mélange pour "salir" les couleurs façon imprimerie */
+ mix-blend-mode: multiply;
+}
+
+/* #endregion */
+
+/* #endregion */

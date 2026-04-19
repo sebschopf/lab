@@ -1,0 +1,358 @@
+---
+---
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Laboratoire Brutaliste OKLCH : Couleurs Brutes & Ombres Dures. Exploration des couleurs modernes en CSS.">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <title>Laboratoire Brutaliste OKLCH</title>
+  
+ </head>
+ <body>
+  <div class="container">
+    <header>
+     <h1>Brutaliste OKLCH</h1>
+     <p>Laboratoire Pratique : Couleurs Brutes & Ombres Dures
+     </p>
+      {% include nav.html %}
+    </header>
+
+   <!-- SECTION 1 : THÈME DYNAMIQUE -->
+   <section class="doc-section">
+    <h2>Couleurs Acides & Calculs</h2>
+    <p>
+     Bon, pour le web design, je suis pas très fort, mais j'aime le
+     brutaliste, on oublie les palettes douces. J'aime sortir de ce que
+     font les gens, le contraste pur, c'est moins nian-nian. Mais même
+     quand on veut faire un bordel visuel, il faut avoir une harmonie.
+     Grâce à notre couleur de base :(
+     <code>--clr-brand</code>
+     ), on utilise
+     <code>calc()</code>
+     et
+     <code>from</code>
+     pour générer une palette agressive mais mathématiquement juste. Parce
+     que bon, l'anarchie et le chaos, ne veut pas dire qu'il n'y a pas de
+     règles. C'est l'ordre... moins le pouvoir.
+    </p>
+    <p>
+     Il faut donc s'organiser dans la composition du thème. en premier lieu
+     on cherche la couleur dominante, la signature. On glisse le bouton sur
+     la barre de l'
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">hue</mark>
+     à gauche et à droite. Mais j'aime bien le rose et le violet donc bon,
+     je me suis arreté à
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">330</mark>
+     . On peut chercher 330.2 même, mais j'aime le simple.
+    </p>
+    <p>
+     On fait pareil avec
+     <code>--l-action</code>
+     et bien sur
+     <code>--c-neon</code>
+     . Mes valeurs sont pour la luminosité
+     <code>l:</code>
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">85%</mark>
+     et la teinte (gris fade ou couleur qui pète)
+     <code>c:</code>
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.35</mark>
+     (sa pique les yeux). Donc mon token qui est ma couleur de marque c'est
+     :
+    </p>
+    <div class="dev-code">
+     --clr-brand: oklch(var(--l-action) var(--c-neon) var(--h-brand));
+    </div>
+    <p>
+     J'ai choisi ce nom de variables comme ça, en explorant le web à gauche
+     à droite, parce que j'aime bien ces termes, c'est pour moi évident.
+     L'action pour tout ce qui va être bouton où il y a une action active
+     et "neon", parce que c'est comme un néon qui clignote. Cela fait mal
+     dans la figure le matin. Je peux donc ajouter d'autres termes si par
+     exemple j'ai besoin de jouer sur la chroma. On peut imaginer avoir
+     besoin d'un composant qui serait différent et moins sujet à attirer
+     l'oeil. Je crée donc une variable
+     <br>
+     <code>--c-neutral</code>
+     <br>
+     C'est plus simple pour moi. A toi de t'organiser comme tu le souhaite.
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Coder doit être un plaisir</mark>
+     .
+    </p>
+
+    <p>
+     D'autres personnes vont dire simplement
+     <code>--l</code>
+     et
+     <code>--c</code>
+     . Il y a même des thèmes qui définissent à l'avance les variations
+     avec des variables de 0 à 100 pour
+     <code>--l</code>
+     .
+     <br>
+     Genre
+     <code>--l-100:100%</code>
+     . Pourquoi pas, cela donne une certaine lisibilité, mais moi j'aime
+     pas trop, surtout que cela ne sert à rien de définir des variables
+     qu'on ne va pas utiliser. C'est du bruit...
+    </p>
+    <p>
+     Donc voilà, je continue ma théorie. Pour moi, avec une luminosité de
+     85% et une teinte de 0.35, je déplace
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">HUE</mark>
+     de 45° à 55°. Donc je vais surtout utiliser
+     <code>calc(h +/- 45)</code>
+     . Je pourrais même faire :
+     <br>
+     <code>--h-plus: (calc(var(--h-brand)) + 45)</code>
+    </p>
+    C'est violent comme sa s'imbrique hein ? C'est pour les thèmes où on
+    aurait plusieurs couleurs complémentaires. Bref, voilà ce que cela donne
+    quand c'est pico bello simple (basique):
+
+    <div class="dev-code">
+     /* Couleur Analogue (Voisine) : On ajoute 45° */
+     <br>
+     <b>background: oklch(from var(--clr-brand) l c calc(h + 45));</b>
+     <br>
+     /* rappel : avec from on annonce le token, et on change QUE ce qu'on
+     choisi
+     <br>
+     <br>
+     /* Couleur Complémentaire (Opposée) : On ajoute 180° */
+     <br>
+     background: oklch(from var(--clr-brand) l c calc(h + 180));
+     <br>
+     /*Avec OKLCH on peut calculer théoriquement la position des couleurs
+     complémentaires et opposés*/
+    </div>
+
+    <div class="grid palette-grid">
+     <div class="color-card">
+      <div class="color-swatch swatch-base" aria-label="Couleur de base">
+        <span>BASE</span>
+      </div>
+      <div class="color-info">
+       Token Origine
+       <code>h: var(--h-brand)</code>
+      </div>
+     </div>
+     <div class="color-card">
+      <div class="color-swatch swatch-analogous" aria-label="Couleur analogue +45°">
+        <span>ANALOGUE</span>
+      </div>
+      <div class="color-info">
+       calc(h + 45)
+       <code>h: 375° (Foushia?)</code>
+      </div>
+     </div>
+     <div class="color-card">
+      <div class="color-swatch swatch-complementary" aria-label="Couleur complémentaire +180°">
+        <span>COMPLÉMENT</span>
+      </div>
+      <div class="color-info">
+       calc(h + 180)
+       <code>h: 150° (Vert pomme?)</code>
+      </div>
+     </div>
+     <div class="color-card">
+      <div class="color-swatch swatch-triadic" aria-label="Couleur triadique -120°">
+        <span>TRIADIQUE</span>
+      </div>
+      <div class="color-info">
+       calc(h - 120)
+       <code>h: 210° (Bleu Électrique?)</code>
+      </div>
+     </div>
+    </div>
+     <p>
+     Alors, c'est là qu'il faut réfléchir quand on construit son thème.
+     Parce que mon CSS, il est pas parfais, mais je l'aime comme ça. J'ai
+     <code>div</code>
+     avec deux class. L'une qui défine les formes la taille, les espacement etc... et l'autre qui
+     a juste les valeurs des couleurs. Dans style.css les règles commencent
+     à la ligne 200 avec
+     <br>
+     <code>.swatch-base</code>
+     .
+    </p>
+     <p>
+     Change la valeur de
+     <code>--h-brand</code>
+     (actuellement 330) dans le CSS à la ligne 10. Tout le site s'adaptera
+     mécaniquement à la nouvelle teinte dominante.
+    </p>
+   </section>
+
+   <!-- SECTION 2 : ANIMATIONS -->
+   <section class="doc-section">
+    <h2>Ombres Solides & Stroboscope</h2>
+    <p>
+     J'aime le brutalisme parce qu'<mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">il n'y a pas de lueur (glow)</mark>
+     . Le flou est interdit. Les ombres sont pleines, noires ou très
+     sombres. On sait où on va et on sait pourquoi l'oeil est attiré à CET endroit... et pas au super flou gaussien qui lisse la bordure... Avec OKLCH pour récupérer la couleur de base, réduire
+     violemment sa luminosité (
+     <code>l</code>
+     ), on peut créer une ombre solide qui se décale mécaniquement.
+    </p>
+
+    <div class="brutal-container">
+     <button type="button" class="brutal-button btn-mechanical">Ombre Mécanique</button>
+     <button type="button" class="brutal-button btn-rgb">Stroboscope HUE</button>
+    </div>
+
+    <h3>Mécanique des ombres (Animation steps)</h3>
+    <p>
+     Pour l'ombre mécanique, au lieu d'une transition douce (ease), je
+     préfère quand sa choque. Donc la fonction
+     <code>steps()</code>
+     dans l'animation CSS c'est pas mal. Le rendu est volontairement
+     saccadé. OKLCH permet d'assombrir l'ombre parfaitement (
+     <code>l=0.5</code>
+     ) sans toucher au reste (ligne 283). On peut donc aussi utiliser
+     <code>from</code>
+     et
+     <code>calc()</code>
+     pour dériver les couleurs dans une animation. Et même les dériver sans
+     les ajouter en dur dans une cascade de lignes, parce que l'élément enfant hérite
+     de son parent. Donc on peut juste changer par exemple
+     <code>l</code>
+     sans devoir tout remettre.
+    </p>
+
+    <div class="dev-code">
+     @keyframes hard-pulse {
+     <br>
+     50% {
+     <br>
+     /* L'ombre devient la couleur de base assombrie (L=0.4) */
+     <br>
+     box-shadow: 10px 10px 0 oklch(from var(--clr-brand) 0.4 c h);
+     <br>
+     transform: translate(-4px, -4px);
+     <br>
+     }
+     <br>
+     }
+     <br>
+     .btn-mechanical {
+     <br>
+     /* steps(3) créer l'animation en 3 images brutes */
+     <br>
+     animation: hard-pulse 2s steps(3) infinite;
+     <br>
+     }
+     <br>
+    </div>
+
+    <p>
+     Le
+     <strong>bouton Stroboscope (à droite)</strong>
+     navigue sur la roue des couleurs en utilisant
+     <code>calc(h + 180)</code>
+     puis
+     <code>calc(h + 360)</code>
+     avec un délai très court, créant un effet hépileptique violent typique quand on veut pas que les gens fassent n'importe quoi :D. Avoue que t'es pas très bien là.
+    </p>
+   </section>
+   <!-- SECTION 3 : TRANSPARENCE BRUTALE CRADE -->
+   <section class="doc-section">
+    <h2>Transparence : Le coup de marqueur</h2>
+    <p>
+     C'est vrai, en brutalisme on déteste ce qui est à moitié. Pas de
+     douceur, c'est crade, etc. Donc l'opacité "propre" à la apple et
+     glassmorphisme on oublie.
+     <br>
+     MAIS on peut utiliser l'opacité comme truc du genre
+     <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight-fluo">vieux coup de marqueur fluo</mark>
+     sur du papier journal (?). Bon là, je suis pas sûr de mon coup, mais...
+     j'ai un trick.
+    </p>
+
+    <p>
+     C'est le petit truc du
+     <code>/ 0.1</code>
+     caché dans les cards de couleurs plus haut ;). Avec
+     <code>oklch()</code>
+     et
+     <code>from</code>
+     , gérer le canal alpha (transparence / opacité) devient facile. Fini les variables
+     <code>rgba()</code>
+     illisibles. Tu prends n'importe quel token existant, tu ne changes ni
+     L, ni C, ni H, et tu rajoutes un slash avec une valeur entre 0 et 1
+     (ou un %) :
+    </p>
+
+    <div class="dev-code">
+     /* On garde la même couleur, on met l'opacité à 40% (ou 0.4) */
+     <br>
+     background: oklch(from var(--clr-complementaire) l c h
+     <b>/ 0.4</b>
+     );
+    </div>
+
+    <p>
+     Cela fait un effet "erreur de calage d'imprimerie" ou glitch dégeu. On
+     peut faire pas mal de truc avec l'opacité et en superposant deux
+     blocs. Le bloc du dessus est transparent (
+     <code>/ 0.7</code>
+     ) et il à un
+     <code>mix-blend-mode: multiply</code>
+     pour que les couleurs s'additionnent comme de la vraie encre :
+    </p>
+
+    <div class="overlap-container">
+     <div class="block-solid">
+      ENCRE DE BASE
+      <br>
+      (Opaque)
+     </div>
+     <div class="block-alpha">
+      SURCOUCHE CRADE
+      <br>
+      (/ 0.7 + multiply)
+     </div>
+    </div>
+    <p>
+     Et en plus... la couleur est liée. Donc on peut changer, sans trop de
+     soucis les variables de départ (j'ai la flemme et je suis sur que j'aurai oublié de modifier la couleur du composant). Je te laisse imaginer avec une animation et
+     <code>step()</code>
+     qu'on a vu avant pour changer les couleurs et bouger les éléments.
+     C'est pas mal non ?
+    </p>
+   </section>
+   <footer>
+      <p class="footer-credit">
+       Apprenti sorcier Mous_tik
+       <br>
+       Big thanks à Christian Diaz pour l'inspiration!
+        <a href="https://la-cascade.io/articles/oklch-e" rel="noopener noreferrer" target="_blank">
+         son article de blog
+        </a>
+      </p>
+             <div class="grid">
+          <a href="./contrast.html">
+            Le contraste automatique
+          </a>
+          <a href="./rythme.html">
+          Le rythme unique
+          </a>
+          <a href="./index.html">
+            OKLCH, c'est quoi ?
+          </a>
+          <a href="./grille.html">
+            La grille magique
+          </a>
+          <a href="./nav.html">
+            Le cauchemar du nav
+        </div>
+      </p>
+      </div>
+   </footer>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,192 @@
+---
+layout: default
+title: "L'Architecture Moustache"
+subtitle: "Comment j'ai arrêté de copier-coller des divs."
+level: 1
+tags: [moustache, jekyll, architecture, statique]
+date: 2024-06-01
+author: mous_tik
+---
+
+    <section class="doc-section">
+     <h2>Le chaos du copié-collé</h2>
+     <p>
+      Jusqu'à présent, dans ce labo, j'écrivais tout en dur.
+      Je voulais une carte ? Je copiais 15 lignes de HTML.
+      Je voulais rajouter une page ? Je copiais tout le <code>&lt;head&gt;</code>, le doctype, le header, le footer.
+     </p>
+     <p>
+      C'est bien pour commencer. C'est l'enfer pour maintenir.
+      Imagine j'ai perdu 10 minutes à changer le nom d'un lien dans le footer sur 5 pages à la main. On va apprendre à se peigner la moustache.
+     </p>
+     <p>
+      Je vais changer de paradigme. Il existe un moteur Jekyll et sa syntaxe "Moustache" (les doubles accolades <code>{% raw %}{{ }}{% endraw %}</code>).
+      L'objectif : <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Séparer le fond de la forme.</mark>
+     </p>
+    </section>
+
+    <section class="doc-section">
+     <h2>Les deux règles de la Moustache</h2>
+     <p>
+      Il n'y a que deux symboles à comprendre. Pas de JavaScript, pas de backend compliqué. Juste des ordres donnés au compilateur avant d'afficher la page.
+     </p>
+
+     <div class="grid">
+       <div class="demo-card" style="flex: 1 1 min(100%, 300px);">
+         <h3>L'Action (Le cerveau)</h3>
+         <div class="dev-code" style="margin: var(--s-1) 0;">{% raw %}{% action %}{% endraw %}</div>
+         <p>Les accolades avec des pourcentages. Ça donne un ordre au compilateur : faire une boucle, vérifier une condition (if), ou inclure un fichier. <strong>Ça ne s'affiche jamais à l'écran.</strong></p>
+       </div>
+       <div class="demo-card" style="flex: 1 1 min(100%, 300px);">
+         <h3>L'Affichage (La voix)</h3>
+         <div class="dev-code" style="margin: var(--s-1) 0;">{% raw %}{{ variable }}{% endraw %}</div>
+         <p>Les doubles accolades simples. C'est pour "recracher" de la donnée dans le HTML. Un titre, une couleur, un calcul. <strong>C'est ce que les personnes verront.</strong></p>
+       </div>
+     </div>
+    </section>
+
+    <section class="doc-section">
+      <h2>L'organisation (Le Tri Sélectif)</h2>
+      <p>
+        Avant d'écrire du code, il faut ranger sa chambre. Jekyll impose une architecture stricte pour s'y retrouver. Si tu as bien fait ton travail, la racine de ton projet ne contiendra presque plus rien, à part les dossiers suivants :
+      </p>
+
+      <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+        <li><strong><code>_layouts/</code></strong> : Les moules (les squelettes de tes pages avec le head, body, etc).</li>
+        <li><strong><code>_includes/</code></strong> : Les pièces de montage (un bouton, une barre de navigation, une carte).</li>
+        <li><strong><code>_data/</code></strong> : Le cerveau (des fichiers texte avec des données brutes qu'on peut appeler. Le niveau 2 en parle mieux. Là je suis en Lvl 1...)</li>
+      </ul>
+    </section>
+
+    <section class="doc-section">
+      <h2>La refonte étape par étape</h2>
+      <p>
+        Voici exactement comment on passe d'un site bordélique à une architecture optimisée, tout en restant 100% statique. On va y aller pas à pas.
+      </p>
+
+      <div class="checklist-item">
+        <span class="checklist-number">1</span>
+        <div>
+          <h3>Créer le Layout (Le Moule Dynamique)</h3>
+          <p>On crée un nouveau fichier <code>_layouts/default.html</code>. Ce sera la coquille de TOUTES nos pages. Mais attention, on ne va pas écrire le titre en dur (<code>&lt;h1&gt;Lab OKLCH&lt;/h1&gt;</code>), sinon toutes nos pages auront le même titre !</p>
+          <p>À la place, on prépare des "trous" que la page viendra remplir grâce à la syntaxe <code>{% raw %}{{ page.variable }}{% endraw %}</code>.</p>
+          <div class="dev-code">
+&lt;!DOCTYPE html&gt;<br>
+&lt;html lang="fr" class="no-js"&gt;<br>
+&nbsp;&lt;head&gt;<br>
+&nbsp;&nbsp;&lt;title&gt;{% raw %}{{ page.title }}{% endraw %} | Lab OKLCH&lt;/title&gt;<br>
+&nbsp;&lt;/head&gt;<br>
+&nbsp;&lt;body&gt;<br>
+&nbsp;&nbsp;&lt;div class="container"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;header&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Le titre et sous-titre sont dynamiques --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;h1&gt;{% raw %}{{ page.title }}{% endraw %}&lt;/h1&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;p&gt;{% raw %}{{ page.subtitle }}{% endraw %}&lt;/p&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/header&gt;<br><br>
+&nbsp;&nbsp;&nbsp;&lt;!-- TOUT le reste de ta page s'injectera ici --&gt;<br>
+&nbsp;&nbsp;&nbsp;{% raw %}{{ content }}{% endraw %}<br><br>
+&nbsp;&nbsp;&nbsp;&lt;footer&gt;...&lt;/footer&gt;<br>
+&nbsp;&nbsp;&lt;/div&gt;<br>
+&nbsp;&lt;/body&gt;<br>
+&lt;/html&gt;
+          </div>
+          <p>Le layout est posé. Il est prêt à recevoir des informations externes pour s'auto-compléter.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">2</span>
+        <div>
+          <h3>Le Front Matter (Le Tableau de bord)</h3>
+          <p>Maintenant, tu prends la page que tu es en train de créer (par exemple <code>moustache.html</code>). Tu supprimes TOUT le body, le head, le footer. Tu ne gardes QUE les sections de contenu.</p>
+          <p>Tout en haut de ce fichier, entre deux lignes de tirets <code>---</code>, tu vas envoyer tes variables au Layout. C'est ça, le Front Matter.<br>
+        Rappel toi. On a dit que <code>{% raw %}{% %}{% endraw %}</code> voulait dire "exécuter une commande Jekyll" et <code>{% raw %}{{ }}{% endraw %}</code> voulait dire "afficher une variable"<br>
+    C'est ce qu'on a fait dans le layout. on a écrit <code>page.title</code> et <code>page.subtitle</code><br>
+et c'est entre quoi comme symbole ?<br>
+<code>{% raw %}{{ }}{% endraw %}</code><br>
+Donc il faut qu'on définisse ces variables dans le Front Matter.<br>
+C'est pourquoi notre fichier ne commence plus comme d'habitude. Mais, pour par exemple <code>moustache.html</code>, on écrit en haut :
+</p>
+
+          <div class="dev-code">
+---<br>
+layout: default<br>
+title: "L'Architecture Moustache"<br>
+subtitle: "Comment j'ai arrêté de copier-coller des divs."<br>
+---<br><br>
+&lt;section class="doc-section"&gt;<br>
+&nbsp;&nbsp;&lt;h2&gt;Le chaos du copié-collé&lt;/h2&gt;<br>
+&nbsp;&nbsp;&lt;p&gt;Jusqu'à présent...&lt;/p&gt;<br>
+&lt;/section&gt;
+          </div>
+          <p><strong>La mécanique :</strong> Jekyll lit le Front Matter. Il voit <code>layout: default</code>.<br>
+            Il ouvre <code>default.html</code>. Partout où il voit <br>
+            <code>{% raw %}{{ page.title }}{% endraw %}</code>,<br>
+            il remplace par "L'Architecture Moustache".<br>
+            Et à la place de <br>
+            <code>{% raw %}{{ content }}{% endraw %}</code>, <br>
+            il colle toutes tes balises qui sont dans <code>&lt;section&gt;</code>.</p>
+        </div>
+      </div>
+
+      <div class="checklist-item">
+        <span class="checklist-number">3</span>
+        <div>
+          <h3>L'Include (Nettoyer le Moule)</h3>
+          <p>Notre fichier <code>_layouts/default.html</code> est super, mais il contient encore tout le menu de navigation et le gros footer codés en dur. Si le menu devient énorme, le fichier Layout deviendra illisible.</p>
+          <p>On crée un fichier <code>_includes/nav.html</code>. Dedans, on met UNIQUEMENT la balise <code>&lt;nav&gt;...&lt;/nav&gt;</code>. Rien d'autre.</p>
+          <p>On crée un <code>_includes/footer.html</code> avec juste le footer.</p>
+          <p>Et on met à jour notre Layout pour "appeler" ces morceaux :</p>
+          <div class="dev-code">
+&lt;header&gt;<br>
+&nbsp;&nbsp;&lt;h1&gt;{% raw %}{{ page.title }}{% endraw %}&lt;/h1&gt;<br>
+&nbsp;&nbsp;&lt;p&gt;{% raw %}{{ page.subtitle }}{% endraw %}&lt;/p&gt;<br>
+&nbsp;&nbsp;&lt;!-- On appelle la navigation --&gt;<br>
+&nbsp;&nbsp;{% raw %}{% include nav.html %}{% endraw %}<br>
+&lt;/header&gt;<br><br>
+{% raw %}{{ content }}{% endraw %}<br><br>
+&lt;!-- On appelle le footer --&gt;<br>
+{% raw %}{% include footer.html %}{% endraw %}
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="doc-section">
+     <h2>Bilan de cette étape</h2>
+     <p>
+      À ce stade :
+      <ul style="margin-left: 2rem; margin-top: 1rem;">
+        <li>Si je veux créer un nouvel article, j'ai juste à remplir le <strong>Front Matter</strong> et écrire mon texte. 0 ligne de structure HTML à taper.</li>
+        <li>Si je dois changer la balise meta de tout mon site, j'ai UN fichier (<code>_layouts/default.html</code>).</li>
+        <li>Si je dois ajouter un lien dans le menu, j'ai UN fichier (<code>_includes/nav.html</code>).</li>
+      </ul>
+      <div class="dev-code">
+        &lt;p>&lt;!DOCTYPE html&gt;<br>
+        &lt;html lang="fr" class="no-js"&gt;<br>
+        {% raw %}{% include head.html %}{% endraw %} <br>
+        &lt;body&gt;<br>
+        &lt;div class="container"&gt;<br>
+        {% raw %}{% include header.html %}{% endraw %}<br>
+        &lt;section class="doc-section"&gt;<br>
+        &lt;h2&gt;Le chaos du copié-collé&lt;/h2&gt;<br>
+        &lt;p&gt;Jusqu'à présent...&lt;/p&gt;&lt;/section&gt;<br>
+        {% raw %}{% include footer.html %}{% endraw %}<br>
+        &lt;/div&gt;<br>
+        &lt;/body&gt;<br>
+        &lt;/html&gt;</p>
+      </div>
+    <p>Voila comment se termine cette étape. Avec un layout qui n'a presque plus de balises codées en dur.<br>
+      Elles se trouve dans les fichiers <code>_includes/</code>
+    </p>
+    <p>
+        C'est une architecture plus propre, plus maintenable, plus scalable.
+        Et cerise sur le gateau ! J'ai imbriqué des includes dans des includes. Par exemple, le header inclut la nav.<br>
+        Donc si je change le header, la nav se met à jour automatiquement sur toutes les pages.
+     </p>
+     <p>
+      On vient de nettoyer un peu le lab. On peut presque rendre dynamique le contenu. Mais ça, c'est pour demain...<br>
+      on verra comment on peut automatiser le menu de navigation et les composants grâce au dossier <code>_data</code> et aux boucles. La vraie programmation commence.
+     </p>
+    </section>
