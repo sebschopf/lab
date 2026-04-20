@@ -1,0 +1,20 @@
+- name: principale
+  url: /index.html
+
+- name: grille
+  url: /grille.html
+
+- name: rythme
+  url: /rythme.html
+
+- name: contraste
+  url: /contrast.html
+
+- name: jerkyll
+  url: /jerkyll.html
+
+- name: nav
+  url: /nav.html
+
+- name: nav+
+  url: /nav_round2.html

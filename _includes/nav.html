@@ -1,8 +1,18 @@
 <nav class="grid" style="margin-top: var(--s-3);">
-    <a class="brutal-button" href="./">Accueil</a>
-    <a class="brutal-button" href="./grille.html">Grille</a>
-    <a class="brutal-button" href="./rythme.html">Rythme</a>
-    <a class="brutal-button" href="./contrast.html">Contraste</a>
-    <a class="brutal-button" href="./nav.html">Le NAV</a>
-    <a class="brutal-button" href="./jerkyll.html">Jekyll</a>
+  {% for link in site.data.navigation %}
+    
+    {% assign is_active = false %}
+    {% if page.url == link.url %}
+      {% assign is_active = true %}
+    {% endif %}
+
+    <a 
+      href="{{ link.url | relative_url }}" 
+      class="brutal-button {% if is_active %}active{% endif %}"
+      {% if is_active %}aria-current="page"{% endif %}
+    >
+      {{ link.name }}
+    </a>
+    
+  {% endfor %}
 </nav>

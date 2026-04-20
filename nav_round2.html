@@ -1,0 +1,191 @@
+---
+layout: default
+title: "Le NAV Niveau 2"
+subtitle: "Pourquoi tu n'as plus jamais besoin d'éditer ton menu. Jamais."
+level: 2
+tags: [jekyll, liquid, boucle, for, navigation, auto, assign]
+date: 2026-04-20
+author: mous_tik
+---
+
+<section class="doc-section">
+  <h2>Le problème de la main d'œuvre</h2>
+  <p>
+    Dans <a href="./nav.html">le nav niveau 1</a>, on a nettoyé le code. On a isolé notre menu dans <code>_includes/nav.html</code>. C'est propre.
+  </p>
+  <p>
+    Mais si je veux ajouter un lien, je dois encore ouvrir ce fichier, copier une balise <code>&lt;a&gt;</code>, taper l'URL, taper le nom. C'est chiant. On est des bidouilleurs, on veut que la machine travaille pour nous. On va faire ça étape par étape.
+  </p>
+</section>
+
+<section class="doc-section">
+  <h2>Étape 1 : L'usine à liens (La boucle `for`)</h2>
+  <p>
+    On va introduire le concept de <strong>Source de Vérité</strong>.
+    On crée un fichier texte brut <code>_data/navigation.yml</code>. Dedans, on ne met que de la donnée pure. Pas de HTML. Juste une liste avec le nom et le chemin.
+  </p>
+
+  <div class="dev-code">
+# _data/navigation.yml<br>
+- name: "Accueil"<br>
+&nbsp;&nbsp;url: "/index.html"<br><br>
+- name: "Grille"<br>
+&nbsp;&nbsp;url: "/grille.html"<br><br>
+- name: "Rythme"<br>
+&nbsp;&nbsp;url: "/rythme.html"
+  </div>
+
+  <p>
+    Ensuite, dans notre fichier <code>_includes/nav.html</code>, on demande à Jekyll de lire ce fichier et de fabriquer les boutons à notre place avec la commande <code>{% raw %}{% for %}{% endraw %}</code> :
+  </p>
+
+  <div class="dev-code">
+&lt;nav class="grid"&gt;<br>
+{% raw %}{% for item in site.data.navigation %}{% endraw %}<br>
+&nbsp;&nbsp;&lt;a href="{% raw %}{{ item.url }}{% endraw %}" class="brutal-button"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{{ item.name }}{% endraw %}<br>
+&nbsp;&nbsp;&lt;/a&gt;<br>
+{% raw %}{% endfor %}{% endraw %}<br>
+&lt;/nav&gt;
+  </div>
+
+  <p>
+    <strong>Explication :</strong> La boucle <code>for</code> prend le premier élément du fichier YAML (qu'elle nomme <code>item</code>), crée le HTML, puis passe au suivant. Tu veux changer l'ordre de ton menu ? Tu déplaces les lignes dans le fichier YAML. Terminé.
+  </p>
+</section>
+
+<section class="doc-section">
+  <h2>Le mirage de l'automatisation totale</h2>
+  <p>
+    Attends... <em>Wait</em>. On déclare nos pages avec le Front Matter en haut de chaque fichier HTML. Pourquoi on les déclare <strong>UNE DEUXIÈME FOIS</strong> dans un fichier YAML ? C'est de la répétition non ?
+  </p>
+  <p>
+    Il existe une variable magique dans Jekyll : <code>site.html_pages</code>. Elle contient absolument toutes les pages du site. 
+  </p>
+
+  <div class="dev-code">
+{% raw %}{% for item in site.html_pages %}{% endraw %}<br>
+&nbsp;&nbsp;&lt;a href="{% raw %}{{ item.url }}{% endraw %}" class="brutal-button"&gt;{% raw %}{{ item.title }}{% endraw %}&lt;/a&gt;<br>
+{% raw %}{% endfor %}{% endraw %}
+  </div>
+
+  <p>
+    Alors là c'est le pompon. Tu crées un fichier HTML, il apparaît tout seul dans le menu. Zéro configuration. Jamais. 
+  </p>
+
+  <h3 style="margin-top: 2rem;">Pourquoi c'est un piège (je suis tombé dedans comme un noob)?</h3>
+  <p>
+    Parce que la machine est stupide. <br>
+    Si tu utilises <code>site.html_pages</code>, comment tu choisis l'ordre des boutons ? <br>
+    Et ta page 404 ? Elle va dans le menu ?<br>
+    Et tes brouillons ?<br>
+    Et ta page de test ?
+  </p>
+  <p>
+    Pour un projet de 3 pages, c'est rigolo. Quand ton projet en a 20... c'est l'enfer. 
+    Tu perds le contrôle de ton architecture. C'est pour ça qu'on revient sagement à notre fichier 
+    <code>_data/navigation.yml</code>. 
+  </p>
+</section>
+
+<section class="doc-section">
+  <h2>Étape 2 : Donner un cerveau (La condition `if`)</h2>
+  <p>
+    Puisqu'on a notre boucle propre, on veut que le bouton de la page actuelle s'allume (pour dire "Tu es ici"). On va dire à Jekyll d'analyser l'URL de la page où se trouve le visiteur (<code>page.url</code>), et de la comparer avec l'URL du bouton (<code>item.url</code>).
+  </p>
+
+  <div class="dev-code">
+&lt;nav class="grid"&gt;<br>
+&nbsp;&nbsp;{% raw %}{% for item in site.data.navigation %}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;a <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;href="{% raw %}{{ item.url }}{% endraw %}" <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="brutal-button {% raw %}{% if page.url == item.url %}active{% endif %}{% endraw %}"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{% if page.url == item.url %}aria-current="page"{% endif %}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{{ item.name }}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/a&gt;<br>
+&nbsp;&nbsp;{% raw %}{% endfor %}{% endraw %}<br>
+&lt;/nav&gt;
+  </div>
+
+  <p>
+    <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Explication :</mark> Si la condition est vraie, Jekyll écrit le mot <code>active</code> dans la classe, et ajoute <code>aria-current="page"</code> pour l'accessibilité. Zéro JavaScript. C'est généré en dur au Build-Time.
+  </p>
+  <p>
+    Ça marche. Tous les tutos sur internet s'arrêtent là. Mais si on regarde bien... il y a un truc très moche.
+  </p>
+</section>
+
+<section class="doc-section">
+  <h2>Étape 3 : Le niveau Pro (La variable `assign`)</h2>
+  <p>
+    Regarde le code juste au-dessus. On a écrit DEUX fois exactement la même question : <br>
+    <code>{% raw %}{% if page.url == item.url %}{% endraw %}</code>. <br>
+    Une fois pour le CSS, une fois pour l'accessibilité. 
+  </p>
+  <blockquote>
+    <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Tu ne fais jamais la même comparaison plus d'une fois.</mark>
+  </blockquote>
+  <p>
+    C'est la différence entre quelqu'un qui écrit du Liquid et quelqu'un qui maîtrise Liquid. Pour optimiser ça, on utilise la commande <code>{% raw %}{% assign %}{% endraw %}</code>. Elle permet de faire le calcul <strong>une seule fois</strong> et de ranger le résultat (vrai ou faux) dans une "boîte". Ensuite, on réutilise cette boîte.
+  </p>
+
+  <div class="dev-code">
+&lt;nav class="grid"&gt;<br>
+&nbsp;&nbsp;{% raw %}{% for item in site.data.navigation %}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- 1. ON CRÉE LA BOÎTE (Fausse par défaut) --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{% assign is_active = false %}{% endraw %}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- 2. ON FAIT LE CALCUL UNE SEULE FOIS --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{% if page.url == item.url %}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{% assign is_active = true %}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{% endif %}{% endraw %}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- 3. ON UTILISE LA BOÎTE POUR L'AFFICHAGE --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;a <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;href="{% raw %}{{ item.url }}{% endraw %}" <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="brutal-button {% raw %}{% if is_active %}active{% endif %}{% endraw %}"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{% if is_active %}aria-current="page"{% endif %}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% raw %}{{ item.name }}{% endraw %}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/a&gt;<br>
+&nbsp;&nbsp;{% raw %}{% endfor %}{% endraw %}<br>
+&lt;/nav&gt;
+  </div>
+
+  <p>
+    <strong>Pourquoi c'est mieux ?</strong> Moins de calculs à la compilation, impossible d'avoir un bug où la classe s'active mais pas l'attribut, et surtout, si on veut ajouter un style plus tard, on a juste à taper <code>{% raw %}{% if is_active %}{% endraw %}</code>. C'est robuste.
+  </p>
+</section>
+
+<section class="doc-section">
+  <h2>Bilan de l'Architecture</h2>
+
+  <div class="checklist-item">
+    <span class="checklist-number">1</span>
+    <div>
+      <h3>La Séparation des Pouvoirs (pas comme certains pays...)</h3>
+      <p>Le _layout (<code>default.html</code>) fait la structure. Le _includes (<code>nav.html</code>) fait la logique de boucle. 
+        Le _data (<code>navigation.yml</code>) donne le contenu et l'ordre. Rien ne se mélange.</p>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <span class="checklist-number">2</span>
+    <div>
+      <h3>L'Évolutivité</h3>
+      <p>Tu veux renommer "Accueil" en "Home" ? Tu changes un mot dans le YAML. 
+        Le composant met à jour toutes les pages du site instantanément à la compilation.</p>
+    </div>
+  </div>
+
+  <div class="checklist-item">
+    <span class="checklist-number">3</span>
+    <div>
+      <h3>L'Accessibilité Native</h3>
+      <p>Grâce au <code>aria-current="page"</code> et la variable <code>is_active</code> générés côté serveur, les lecteurs d'écran savent exactement 
+        où ils sont sans attendre le chargement d'un lourd script JS.</p>
+    </div>
+  </div>
+</section>
