@@ -241,11 +241,13 @@ author: mous_tik
 
         <section class="doc-section">
             <h2>3. la méta class [data-char] :<br> la sorcellerie pure et dure</h2>
-                <p>Maintenant qu'on l'explication de la structure, qu'on peut à peu prêt 
-                    expliuqer comment la grille est construite. On revient tout en haut. Re regarde la première ligne
-                    tu es peut-être passé à côté. <br>
-                Tu imagines déjà un <code>&lt;div&gt;</code> pour chaque lettre ? genre <code>&lt;div class="lettre-N"&gt;</code> pour la lettre N, <code>&lt;div class="H"&gt;</code> pour la lettre H, etc ? <br>
-                Mais pas du tout. Il faut comprendre ce qu'est <code>[data--char]</code>.
+            <p>Maintenant qu'on l'explication de la structure, qu'on peut à peu prêt 
+                expliquer comment la grille est construite. On revient tout en haut. Re regarde la première ligne 
+                tu es peut-être passé à côté. <br>
+                Tu imagines déjà un <code>&lt;div&gt;</code> pour chaque lettre ? genre 
+                <code>&lt;div class="lettre-N"&gt;</code> pour la lettre N, <code>&lt;div class="H"&gt;</code> 
+                pour la lettre H, etc ?<br>
+                Mais pas du tout. Il faut comprendre ce qu'est <code>[data-]</code>.
                 Définition : moi dans mon css j'ai écris : <code>[data-matrice-char] { ... }</code>.<br>
                 Ce n'est pas une class, un selecteur d'attribut. C'est à dire qu'on dit au navigateur : 
                 "Yo, à chaque fois que tu vois un élément HTML qui est <code>data-matrice-char</code>, applique lui cette logique de construction".<br>
@@ -264,8 +266,7 @@ author: mous_tik
                 <code>Tu sais créer un API !!!!!!!</code> ET en CSS. C'est de la magie de dingue. <br>
                 Maintenant tu sais où va agir le clip-path et où il va chercher la donnée pour l'appliquer à la classe. 
                 Et on va aller le voir de plus près.
-                </p>
-            </div> 
+            </p> 
         </section>
 
         <section class="doc-section">
@@ -285,7 +286,8 @@ author: mous_tik
             dans <code>[data-matrice-char]::after</code>. le clip-path découpe la forme hérité de <code>[data-matrice-char]</code> 
             et des propriétés comme <code>background: var(--color-black);</code>. 
             Tu veux une lettre en texture de bruit ou un GIF animé ? <code>background: var(--color-texture);</code>. 
-            La forme restera intacte. C'est toi qui les définis si tu en as envie. MAIS attention, avec des <code>var(--variable)</code></p>
+            La forme restera intacte. C'est toi qui les définis si tu en as envie. MAIS attention, avec des <code>var(--variable)</code>
+            </p>
 
             <p>Le masque global s'applique sur un pseudo-élément qui 
             recouvre toute la grille :</p>
