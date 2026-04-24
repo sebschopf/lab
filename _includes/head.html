@@ -22,7 +22,8 @@
 
     <!-- Auto-load page specific CSS if exists (convention over configuration) -->
     {% capture page_css %}{{ page.name | replace: '.html', '.css' }}{% endcapture %}
-    {% assign css_exists = site.static_files | where: "path", page_css | first %}
+    {% capture page_css_full %}/{{ page_css }}{% endcapture %}
+    {% assign css_exists = site.static_files | where: "path", page_css_full | first %}
     {% if css_exists %}
     <link rel="stylesheet" href="{{ page_css | relative_url }}">
     {% endif %}
