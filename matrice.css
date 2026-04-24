@@ -1,0 +1,371 @@
+/* ==========================================================================
+   MATRICE CSS : Visualisation du système de coordonnées
+   Exclusif à matrice.html - Styles isolés
+   ========================================================================== */
+
+/* ==================================================
+   1. LA GRILLE DE BASE 4x4
+   ================================================== */
+.demo-grid {
+    --demo-size: 320px;
+    --demo-gap: 8px;
+    --demo-inner: 0.6;
+    
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: var(--demo-gap);
+    width: var(--demo-size);
+    height: var(--demo-size);
+    margin: 2rem auto;
+    position: relative;
+    border: 3px solid var(--clr-border);
+    background: var(--clr-surface);
+}
+
+.demo-cell {
+    border: 2px dashed var(--clr-brand);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: oklch(from var(--clr-brand) 95% 0.05 h);
+}
+
+/* Carré interne 60% */
+.demo-cell::before {
+    content: '';
+    position: absolute;
+    width: calc(100% * var(--demo-inner));
+    height: calc(100% * var(--demo-inner));
+    border: 2px solid var(--clr-border);
+    background: oklch(from var(--clr-brand) 70% 0.1 h);
+}
+
+/* Labels des points de coordonnées */
+.demo-point-label {
+    position: absolute;
+    font-family: monospace;
+    font-size: 0.6rem;
+    font-weight: 900;
+    background: var(--clr-surface);
+    padding: 1px 2px;
+    z-index: 15;
+}
+
+/* Points de coordonnées (Les 16 vrais points !) */
+.demo-point {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-brand);
+    border-radius: 0%;
+    transform: translate(-90%, -90%);
+    z-index: 10;
+}
+
+/* Coordonnées X (Calculées automatiquement selon l'épaisseur du carré interne) */
+.demo-point.x1 { left: 0%; }
+.demo-point.x2 { left: calc(56% - (var(--demo-inner) * 52%)); }
+.demo-point.x3 { left: calc(56% + (var(--demo-inner) * 52%)); }
+.demo-point.x4 { left: 108%; }
+
+/* Coordonnées Y (Calculées automatiquement selon l'épaisseur du carré interne) */
+.demo-point.y1 { top: 0%; }
+.demo-point.y2 { top: calc(54% - (var(--demo-inner) * 48%)); }
+.demo-point.y3 { top: calc(58% + (var(--demo-inner) * 48%)); }
+.demo-point.y4 { top: 108%; }
+
+
+/* ==================================================
+   2. SYSTÈME DE COORDONNÉES VISIBLE
+   ================================================== */
+.demo-coord-system {
+    position: relative;
+    width: 100%;
+    margin: 2rem 0;
+}
+
+.demo-axis-label {
+    font-family: monospace;
+    font-weight: 900;
+    font-size: 1.2rem;
+    position: absolute;
+}
+
+.demo-axis-x .demo-axis-label {
+    top: -2rem;
+}
+
+.demo-axis-y .demo-axis-label {
+    left: -2rem;
+}
+
+/* Grille avec numéros */
+.demo-grid-coords {
+    counter-reset: cell;
+}
+
+.demo-grid-coords .demo-cell::after {
+    counter-increment: cell;
+    content: counter(cell);
+    font-family: monospace;
+    font-weight: 900;
+    z-index: 5;
+}
+
+/* ==================================================
+   3. DÉMONSTRATION CLIP-PATH PAS À PAS
+   ================================================== */
+.demo-clip {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 2rem auto;
+    background: var(--clr-surface);
+    border: 4px solid var(--clr-border);
+}
+
+.demo-clip-shape {
+    position: absolute;
+    inset: 0;
+    background: var(--clr-brand);
+    clip-path: polygon(
+        0% 0%,
+        0% 100%,
+        20% 100%,
+        80% 20%,
+        80% 100%,
+        100% 100%,
+        100% 0%,
+        80% 0%,
+        20% 80%,
+        20% 0%,
+        0% 0%
+    );
+    transition: clip-path 0.5s steps(3);
+}
+
+.demo-point-number {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: var(--clr-text);
+    color: var(--clr-surface);
+    font-family: monospace;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+/* ==================================================
+   4. LA LETTRE FONCTIONNELLE
+   ================================================== */
+[data-matrice-char] {
+    --size: 240px;
+    --gap-size: 4px;
+    --inner-ratio: 0.6;
+
+    --cell-size: calc((var(--size) - (var(--gap-size) * 3)) / 4);
+    --inner-size: calc(var(--cell-size) * var(--inner-ratio));
+    --offset: calc((var(--cell-size) - var(--inner-size)) / 2);
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: var(--gap-size);
+    width: var(--size);
+    height: var(--size);
+    position: relative;
+    margin: 2rem auto;
+
+    /* LE SECRET DE L'OMBRE BRUTALISTE :
+       clip-path coupe les box-shadow standards. 
+       Il faut utiliser un filter drop-shadow sur le conteneur parent ! */
+    filter: drop-shadow(8px 8px 0 var(--clr-border));
+}
+
+/* Axe X */
+[data-matrice-char] {
+    --A-x1: 0;
+    --A-x2: var(--offset);
+    --A-x3: calc(var(--offset) + var(--inner-size));
+    --A-x4: var(--cell-size);
+
+    --B-start: calc(var(--A-x4) + var(--gap-size));
+    --B-x1: var(--B-start);
+    --B-x2: calc(var(--B-start) + var(--offset));
+    --B-x3: calc(var(--B-start) + var(--offset) + var(--inner-size));
+    --B-x4: calc(var(--B-start) + var(--cell-size));
+
+    --C-start: calc(var(--B-x4) + var(--gap-size));
+    --C-x1: var(--C-start);
+    --C-x2: calc(var(--C-start) + var(--offset));
+    --C-x3: calc(var(--C-start) + var(--offset) + var(--inner-size));
+    --C-x4: calc(var(--C-start) + var(--cell-size));
+
+    --D-start: calc(var(--C-x4) + var(--gap-size));
+    --D-x1: var(--D-start);
+    --D-x2: calc(var(--D-start) + var(--offset));
+    --D-x3: calc(var(--D-start) + var(--offset) + var(--inner-size));
+    --D-x4: calc(var(--D-start) + var(--cell-size));
+
+    /* Axe Y */
+    --R1-y1: 0;
+    --R1-y2: var(--offset);
+    --R1-y3: calc(var(--offset) + var(--inner-size));
+    --R1-y4: var(--cell-size);
+
+    --R2-start: calc(var(--R1-y4) + var(--gap-size));
+    --R2-y1: var(--R2-start);
+    --R2-y2: calc(var(--R2-start) + var(--offset));
+    --R2-y3: calc(var(--R2-start) + var(--offset) + var(--inner-size));
+    --R2-y4: calc(var(--R2-start) + var(--cell-size));
+
+    --R3-start: calc(var(--R2-y4) + var(--gap-size));
+    --R3-y1: var(--R3-start);
+    --R3-y2: calc(var(--R3-start) + var(--offset));
+    --R3-y3: calc(var(--R3-start) + var(--offset) + var(--inner-size));
+    --R3-y4: calc(var(--R3-start) + var(--cell-size));
+
+    --R4-start: calc(var(--R3-y4) + var(--gap-size));
+    --R4-y1: var(--R4-start);
+    --R4-y2: calc(var(--R4-start) + var(--offset));
+    --R4-y3: calc(var(--R4-start) + var(--offset) + var(--inner-size));
+    --R4-y4: calc(var(--R4-start) + var(--cell-size));
+}
+
+[data-matrice-char]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg, var(--clr-brand));
+    background-image: var(--texture, none);
+    background-size: var(--s-2) var(--s-2);
+}
+
+[data-matrice-char="N"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--D-x2) var(--R1-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--A-x3) var(--R4-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x1) var(--R1-y1)
+    );
+}
+
+[data-matrice-char="H"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R3-y3),
+        var(--D-x2) var(--R3-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x2) var(--R2-y2),
+        var(--A-x3) var(--R2-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+[data-matrice-char="O"]::after {
+    clip-path: polygon(
+        /* Extérieur octogonal (Sens HORAIRE) */
+        var(--A-x3) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x4) var(--R1-y3),
+        var(--D-x4) var(--R4-y2),
+        var(--D-x2) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x1) var(--R4-y2),
+        var(--A-x1) var(--R1-y3),
+        var(--A-x3) var(--R1-y1),
+
+        /* La fente d'entrée vers l'intérieur */
+        var(--B-x2) var(--R2-y2),
+
+        /* Le trou intérieur carré (Sens ANTI-HORAIRE) */
+        var(--B-x2) var(--R3-y3),
+        var(--C-x3) var(--R3-y3),
+        var(--C-x3) var(--R2-y2),
+        var(--B-x2) var(--R2-y2),
+
+        /* La fente de retour pour fermer */
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+[data-matrice-char="M"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R2-y1),
+        var(--B-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+        var(--D-x2) var(--R2-y1),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--C-x1) var(--R3-y2),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x1) var(--R1-y1)
+    );
+}
+
+/* ==================================================
+   5. CONTRÔLES PARAMÉTRIQUES
+   ================================================== */
+.demo-controls {
+    border: 3px solid var(--clr-border);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    background: var(--clr-surface);
+}
+
+.demo-control {
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.demo-control label {
+    font-family: monospace;
+    font-weight: 900;
+    min-width: 120px;
+}
+
+/* ==================================================
+   6. LÉGENDE ET EXPLICATIONS
+   ================================================== */
+.demo-legend {
+    border-left: 4px solid var(--clr-brand);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-family: monospace;
+}
+
+.demo-legend dt {
+    font-weight: 900;
+    margin-top: 0.5rem;
+}
+
+.demo-legend dd {
+    margin-left: 1rem;
+    opacity: 0.8;
+}

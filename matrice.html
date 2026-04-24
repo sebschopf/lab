@@ -1,0 +1,416 @@
+---
+layout: default
+title: "La Matrice : Alphabet Géométrique en CSS"
+subtitle: "Comment j'ai créé un alphabet brutaliste génératif avec une grille de carrés imbriqués et le pouvoir du clip-path en CSS"
+level: 2
+tags: ["CSS", "Design", "Typographie", "Brutalisme", "Clip-path", "Grille"]
+date: 2026-04-24
+author: mous_tik
+---
+
+        <section class="doc-section">
+            <p>Tout a commencé par une fascination pour le projet de design graphique de <a href="https://www.typotheque.com/articles/nguyen_gobber_hofmann_modular_typography">Nguyen Gobber et Hofmann</a>. 
+            Leur approche de la typographie modulaire repose sur un système de grille proportionnelle où 
+            des cercles parfaits s'entremêlent pour former des lettres d'une fluidité cool et la lisibilité discutable :D.</p>
+
+            <p>C'est un concept de géométrie incroyable car la proportionalité est automatisée. Mais pour 
+                mon espace expérimental, j'ai une autre ambition : 
+            le brutalisme (poum poum poum). Comment reprendre cette logique de proportionnalité stricte, mais en éliminant 
+            la moindre courbe ? Comment remplacer la douceur d'un cercle par la violence d'un angle droit 
+            ou d'un biseau tranchant ?</p>
+
+            <p>La réponse ne se trouve pas dans un logiciel de dessin, mais dans 
+            l'architecture même du CSS : la grille, les variables mathématiques, et la propriété clip-path.
+            C'est partie pour le tunel dans la création d'un alphabet brutaliste génératif.</p>
+        </section>
+
+        <section class="doc-section">
+            <h2>1. La Théorie : Tuer la courbe, inventer la matrice</h2>
+
+            <p>Dans le projet original, les concepteurs utilisaient une grille
+            de 4x4 cellules contenant des cercles. Le défi du brutalisme est que l'absence de courbes nous 
+            prive des intersections naturelles qu'offrent les arcs de cercle pour tracer des diagonales.</p>
+
+            <p>Si nous utilisions de simples carrés pleins dans une grille 4x4, nous obtiendrions du pixel-art 
+            basique des années 80. Pas du brutalisme moderne.</p>
+
+            <h3>Le concept du "Carré dans le Carré"</h3>
+
+            <p>Pour obtenir des pleins, des déliés et des angles obliques (des chanfreins), il faut complexifier la 
+            grille interne de chaque module. La solution ? Une matrice de carrés imbriqués.</p>
+
+            <p>Imagine une grille classique de 4x4. Entre chaque cellule, il y a un espace vide (le gap).
+            Maintenant, à l'intérieur de chaque grande cellule, dessine un carré plus petit (par exemple, occupant 60% de l'espace). 
+            En prolongeant virtuellement les lignes de ce petit carré vers les bords extérieurs, tu vas avoir 
+            une une sous-grille de 3x3 à l'intérieur de chaque cellule.</p>
+
+            <p>Nous obtenons alors une cartographie 
+            d'une précision complexe, mais fiable. Les intersections de ces lignes ne sont plus de simples coins, mais 
+            des points de pivot qui vont nous permettre de tracer des diagonales franches et des épaisseurs 
+            de trait mathématiquement parfaites.</p>
+
+            <div class="demo-grid">
+                <div class="demo-cell">
+                    <!-- Ligne 1 -->
+                    <div class="demo-point x1 y1"></div>
+                    <div class="demo-point x2 y1"></div>
+                    <div class="demo-point x3 y1"></div>
+                    <div class="demo-point x4 y1"></div>
+                    
+                    <!-- Ligne 2 -->
+                    <div class="demo-point x1 y2"></div>
+                    <div class="demo-point x2 y2"></div>
+                    <div class="demo-point x3 y2"></div>
+                    <div class="demo-point x4 y2"></div>
+                    
+                    <!-- Ligne 3 -->
+                    <div class="demo-point x1 y3"></div>
+                    <div class="demo-point x2 y3"></div>
+                    <div class="demo-point x3 y3"></div>
+                    <div class="demo-point x4 y3"></div>
+                    
+                    <!-- Ligne 4 -->
+                    <div class="demo-point x1 y4"></div>
+                    <div class="demo-point x2 y4"></div>
+                    <div class="demo-point x3 y4"></div>
+                    <div class="demo-point x4 y4"></div>
+                </div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+                <div class="demo-cell"></div>
+            </div>
+
+            <div class="demo-legend">
+                <dl>
+                    <dt>⬜ Grille externe</dt>
+                    <dd>Les 4x4 cellules maîtresses avec l'espacement</dd>
+                    <dt>◽ Carré interne</dt>
+                    <dd>Le carré de 60% qui crée nos points d'ancrage intérieurs</dd>
+                    <dt>⬛ Points de coordonnées</dt>
+                    <dd>Les 16 points où nous pouvons accrocher nos lignes</dd>
+                </dl>
+            </div>
+        </section>
+
+        <section class="doc-section">
+            <h2>2. Le CSS : Jouer à la Bataille Navale</h2>
+
+            <p>Là, c'est chaud. Si on regarde mon html, on a une suite de div... 
+                mais c'est violent. Imagine écrire en dur dans le html 250 points 
+                de ta grille. PAR LETTRE.<br>
+                Avant de "dessiner", nous devons coder notre plan de travail. 
+                C'est ici que les Variables CSS (Custom Properties) vont être utiles.
+                Elles entrent en jeu pour créer notre système de coordonnées, sans les écrire.
+                En gros, elles vont automatiser la grille, je l'explique plus bas.</p>
+
+            <p>Puisque la propriété CSS <code>clip-path: polygon()</code> utilise 
+            des paires de coordonnées (X et Y), il faut nommer les lignes comme sur 
+            un plateau de bataille navale :</p>
+
+            <ul>
+                <li>L'axe X (Horizontal) : Les colonnes A, B, C et D.</li>
+                <li>L'axe Y (Vertical) : Les lignes R1, R2, R3 et R4.</li>
+            </ul>
+
+            <p>Chaque cellule possède 4 repères sur son axe (les bords extérieurs 1 et 4, 
+                les bords intérieurs 2 et 3).
+                Ainsi, le point supérieur gauche du <b>petit</b> carré central de la première cellule en haut à gauche 
+            s'appellera : <code>var(--A-x2) var(--R1-y2)</code>.
+            Première colonne (A), deuxième repère (x2), première ligne (R1), deuxième repère (y2)<br>
+            C'est comme si on lui disait va à la colone 1 et avance de 2 puis va la ligne 2 et avance de 2.
+            (pfiou, c'est chaud hein ?)
+            </p>
+    </p>
+
+            <h3>L'Échafaudage Mathématique</h3>
+
+            <p>Voici le code "racine" qui s'applique au conteneur de notre lettre. 
+            C'est lui qui calcule tout seul les distances en fonction de la taille 
+            souhaitée et du ratio de la grille interne.</p>
+
+            <div class="dev-code">
+                [data-matrice-char] {<br>
+                    <br>
+                    /* --- LES FONDATIONS --- */<br>
+                    --size: 40vmin;<br>
+                    /* Taille totale de la lettre */<br>
+                    --gap-size: 0.5vmin;<br>
+                    /* L'espace entre nos blocs principaux */<br>
+                    --inner-ratio: 0.6;<br>
+                    /* Le petit carré occupe 60% du grand */<br>
+            </div>
+            <div class="dev-code">
+                    /* Le moteur de calcul automatique */<br>
+                    --cell-size: calc((var(--size) - (var(--gap-size) * 3)) / 4);<br>
+                    --inner-size: calc(var(--cell-size) * var(--inner-ratio));<br>
+                    --offset: calc((var(--cell-size) - var(--inner-size)) / 2);<br>
+                }
+            </div>
+
+            <div class="demo-legend">
+                <dl>
+                    <dt> <code>--cell-size</code></dt>
+                    <dd>La taille d'une case individuelle (le premier var()). On retire d'abord les 3 gaps qui séparent nos 4 colonnes (le 2ème var() fois 3), puis on divise par 4. Rien n'est laissé au hasard.</dd>
+                    
+                    <dt> <code>--inner-size</code></dt>
+                    <dd>Le petit carré intérieur. C'est simplement une multiplication du ratio (ici 0.6 = 60%). On change cette valeur et tout l'alphabet mute.</dd>
+                    
+                    <dt> <code>--offset</code></dt>
+                    <dd>La distance magique. C'est l'espace blanc qui sépare le bord extérieur de la case du début de notre carré interne. C'est lui qui crée tous nos biseaux et angles parfaits. Il est toujours égal à la moitié de la différence entre les deux carrés. C'est pas très claire je crois (bonne chance).</dd>
+                </dl>
+            </div>
+
+            <div class="dev-code">
+                /* Mise en page de la grille maître */<br>
+                display: grid;<br>
+                grid-template-columns: repeat(4, 1fr);<br>
+                grid-template-rows: repeat(4, 1fr);<br>
+                gap: var(--gap-size);<br>
+                width: var(--size);<br>
+                height: var(--size);<br>
+                position: relative;<br>
+            </div>
+            <div class="dev-code">
+                /* --- CARTOGRAPHIE DE L'AXE X (Exemple avec A et B) --- */<br>
+                /* Colonne A (gauche) */<br>
+                --A-x1: 0;<br>
+                --A-x2: var(--offset);<br>
+                --A-x3: calc(var(--offset) + var(--inner-size));<br>
+                --A-x4: var(--cell-size);<br>
+                }
+            </div>
+
+            <div class="demo-legend">
+                <dl>
+                    <dt><code>x1 / y1</code></dt>
+                    <dd>Le bord extérieur absolu. C'est le bord dur de la case, le point 0. Il n'y a rien avant ça.</dd>
+                    
+                    <dt><code>x2 / y2</code></dt>
+                    <dd>Le bord intérieur gauche. Début du carré central. C'est le début de notre épaisseur de trait.</dd>
+                    
+                    <dt><code>x3 / y3</code></dt>
+                    <dd>Le bord intérieur droit. Fin du carré central. C'est la fin de notre épaisseur de trait.</dd>
+                    
+                    <dt><code>x4 / y4</code></dt>
+                    <dd>Le bord extérieur droit. Fin de la case. Après ça c'est le gap.</dd>
+                    
+                    <dt> La règle de la mort qui tues</dt>
+                    <dd>Tu ne traces JAMAIS entre deux repères. Tous tes points obligatoirement sur 1, 2, 3 ou 4. 
+                        C'est la contrainte qui fait la beauté du système. Comme l'article source.</dd>
+                </dl>
+            </div>
+
+
+            <div class="dev-code">
+                /* Colonne B (milieu gauche - on prend en compte le gap !) */<br>
+                --B-start: calc(var(--A-x4) + var(--gap-size));<br>
+                --B-x1: var(--B-start);<br>
+                --B-x2: calc(var(--B-start) + var(--offset));<br>
+                --B-x3: calc(var(--B-start) + var(--offset) + var(--inner-size));<br>
+                --B-x4: calc(var(--B-start) + var(--cell-size));<br><br>
+            
+                /* ... (C et D suivent la même logique mathématique) ... */<br>
+            </div>
+
+            <div class="dev-code">
+                /* --- CARTOGRAPHIE DE L'AXE Y (Exemple avec R1) --- */<br>
+                /* Ligne 1 (haut) */<br>
+                --R1-y1: 0;<br>
+                --R1-y2: var(--offset);<br>
+                --R1-y3: calc(var(--offset) + var(--inner-size));<br>
+                --R1-y4: var(--cell-size);<br>
+                <br>
+                /* ... (R2, R3, R4 descendent avec le même calcul) ... */<br>
+            }
+            </div>
+        </section>
+        <section class="doc-section">
+            <h2>3. la méta class [data-char] :<br> la sorcellerie pure et dure</h2>
+                <p>Maintenant qu'on l'explication de la structure, qu'on peut à peu prêt 
+                    expliuqer comment la grille est construite. On revient tout en haut. Re regarde la première ligne
+                    tu es peut-être passé à côté. <br>
+                Tu imagines déjà un <code>&lt;div&gt;</code> pour chaque lettre ? genre <code>&lt;div class="lettre-N"&gt;</code> pour la lettre N, <code>&lt;div class="H"&gt;</code> pour la lettre H, etc ? <br>
+                Mais pas du tout. Il faut comprendre ce qu'est <code>[data--char]</code>.
+                Définition : moi dans mon css j'ai écris : <code>[data-matrice-char] { ... }</code>.<br>
+                Ce n'est pas une class, un selecteur d'attribut. C'est à dire qu'on dit au navigateur : 
+                "Yo, à chaque fois que tu vois un élément HTML qui est <code>data-matrice-char</code>, applique lui cette logique de construction".<br>
+                Mais pas que, une classe on lui dira "ressemble à ça", une classe décore et sculte. Là,on lui dit aussi, il EST une information/identité, 
+                il est de la donnée, une identité.<br>
+                Donc le navigateur va le calculer et lui appliquer les styles et l'identité.<br>
+                Par exemple, plus bas, tu verras un N. il est dans <code>&lt;div data-matrice-char="N"&gt;</code>. 
+                Donc le navigateur va lire "Ah, c'est un élément avec l'attribut <code>data-matrice-char</code>, <br>
+                Il a la valeur N et il EST<code>[data-matrice-char]</code>,<br>
+                C'est comme si on avait une classe "N", mais en plus on peut faire du CSS conditionnel en fonction de la valeur de cet attribut. 
+                Par exemple, on peut dire : <code>[data-matrice-char="N"]::after { clip-path: polygon(...); }</code>. 
+                Et là, le navigateur va aller chercher les données du clip-path uniquement à l'élément qui a <code>data-matrice-char="N"</code>.
+                Et découper la forme de la lettre N sur l'élément virtuel <code>::after</code> <br> 
+                C'est la le twist du CSS qui nous permet d'avoir un seul conteneur générique pour TOUTES les lettres, et de les différencier grâce à leurs attributs. 
+                C'est pratique, c'est super propre, car on n'a pas besoin de créer une classe pour chaque lettre, ni de dupliquer du code. <br>
+                <code>Tu sais créer un API !!!!!!!</code> ET en CSS. C'est de la magie de dingue. <br>
+                Maintenant tu sais où va agir le clip-path et où il va chercher la donnée pour l'appliquer à la classe. 
+                Et on va aller le voir de plus près.
+                </p>
+            </div> 
+        </div>
+
+        <section class="doc-section">
+            <h2>4. La sculture artistique incomprise : clip-path: polygon()</h2>
+
+            <p>Il y a une confusion courante avec le CSS que j'ai apris à mes dépends : 
+                <code>clip-path</code> ne dessine pas un trait, il découpe une forme 
+            (donc pas du tout comme un stroke en SVG). Donc, les coordonées qu'on a défini dans <code>[data-]</code> servent à découper 
+            une forme dans un bloc de couleur. 
+            <code>clip-path</code> agit comme une paire de ciseaux sur une feuille de papier définie par 
+            la propriété background. Qui est dans ? <code>[data-matrice-char]</code> ou si on veut être précis dans 
+            <code>[data-matrice-char]::after</code>
+        </p>
+
+            <p>Pourquoi cette approche ? Le "remplissage" de la lettre est totalement 
+            indépendant de sa forme. Tu veux une lettre noire ? Les propriétés sont définies 
+            dans <code>[data-matrice-char]::after</code>. le clip-path découpe la forme hérité de <code>[data-matrice-char]</code> 
+            et des propriétés comme <code>background: var(--color-black);</code>. 
+            Tu veux une lettre en texture de bruit ou un GIF animé ? <code>background: var(--color-texture);</code>. 
+            La forme restera intacte. C'est toi qui les définis si tu en as envie. MAIS attention, avec des <code>var(--variable)</code></p>
+
+            <p>Le masque global s'applique sur un pseudo-élément qui 
+            recouvre toute la grille :</p>
+
+            <div class="dev-code">
+                [data-matrice-char]::after {<br>
+                    content: '';<br>
+                    position: absolute;<br>
+                    inset: 0;<br>
+                    background: var(--bg, var(--clr-brand))/* La couleur de la lettre */<br>
+                    /* clip-path défini lettre par lettre ci-dessous */<br>
+}
+            </div>
+        </section>
+
+        <section class="doc-section">
+            <h2>5. Pratique : Sculpter la lettre "N"</h2>
+
+            <p>C'est ici que la sorcellerie du clip-path de la matrice opère.</p>
+
+            <p>Prenons la lettre "N". 
+            Sa diagonale est le cauchemar de la grille stricte. 
+            Mais grâce à nos "petits carrés" internes, nous avons les points d'ancrage parfaits 
+            pour créer une diagonale épaisse et tranchante.</p>
+
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
+                <div data-matrice-char="N"></div>
+                <div data-matrice-char="H" style="--bg: oklch(from var(--clr-brand) calc(var(--l-action) - 30%) calc(var(--c-neon) - 0.20) calc(var(--h-brand) - 120))"></div>
+                <div data-matrice-char="O" style="--bg: var(--clr-surface)"></div>
+                <div data-matrice-char="M" style="--texture: radial-gradient(var(--clr-text) 2px, transparent 1px)"></div>
+            </div>
+
+            <p>Dans mon premier essai, le <strong>H était cassé</strong>. Pourquoi ? 
+               Parce que le tracé se croisait. J'avais dit à la barre horizontale de commencer en <code>R2-y4</code> 
+               (le bas de la ligne 2) et de finir en <code>R3-y1</code> (le haut de la ligne 3).
+               Sauf que l'axe Y descend de haut en bas... donc `R2` est au-dessus de `R3` ! 
+               Le bas s'est retrouvé plus haut que le sommet, vrillant le polygone sur lui-même.<br>
+               C'est un style tu me diras, et tu as raison. Les voies du brutalisme sont impénétrables.
+            </p>
+
+            <p>Voici la correction parfaite pour un tracé propre (le fameux H fonctionnel) :</p>
+
+            <div class="dev-code">
+                [data-matrice-char="H"]::after {<br>
+                    clip-path: polygon(<br>
+                        /* Fût Gauche */<br>
+                        var(--A-x1) var(--R1-y1),<br>
+                        var(--A-x1) var(--R4-y4),<br>
+                        var(--A-x3) var(--R4-y4),<br>
+                        <br>
+                        /* On remonte jusqu'au bas de la barre horizontale */<br>
+                        var(--A-x3) var(--R3-y3),<br>
+                        <br>
+                        /* On traverse vers le Fût Droit */<br>
+                        var(--D-x2) var(--R3-y3),<br>
+                        var(--D-x2) var(--R4-y4),<br>
+                        var(--D-x4) var(--R4-y4),<br>
+                        var(--D-x4) var(--R1-y1),<br>
+                        var(--D-x2) var(--R1-y1),<br>
+                        <br>
+                        /* On redescend jusqu'au haut de la barre horizontale */<br>
+                        var(--D-x2) var(--R2-y2),<br>
+                        <br>
+                        /* On retraverse pour fermer */<br>
+                        var(--A-x3) var(--R2-y2),<br>
+                        var(--A-x3) var(--R1-y1)<br>
+                    );<br>
+                }
+            </div>
+        </section>
+
+        <section class="doc-section">
+            <h2>6. L'Ombre Brutaliste et la technique de la "Fente"</h2>
+
+            <p>Je me suis fait avoir...en CSS : <em>Est-ce qu'on est obligé d'utiliser <code>::before</code> et <code>::after</code> pour percer un trou (comme au milieu d'un O) ?</em></p>
+
+            <p>C'est de la triche, mais mal faites en plus :  <code>::after</code> pour dessiner un bloc plein de couleur, et <code>::before</code> 
+                par dessus, peint de la couleur du fond (le `background`), pour donner "l'illusion" d'un trou.</p>
+
+            <p>Mais ça crée un énorme problème : <strong>On ne peut plus mettre d'ombres !</strong></p>
+            
+            <p>Si tu tentes de mettre un <code>box-shadow</code>, il se fera couper net par le <code>clip-path</code>. <br>
+                La solution est d'appliquer un filtre <code>filter: drop-shadow(...)</code> sur le conteneur parent 
+                (comme c'est le cas sur l'exemple des lettres ci-dessus !). Sauf que... si ton trou n'est qu'une tricherie de couleur pleine, 
+                le navigateur considère ta lettre comme un gros bloc rectangulaire et l'ombre bave n'importe comment.</p>
+
+            <h3>La solution du slit : La Fente </h3>
+
+            <p>Pour pouvoir mettre une  ombre, il faut que le polygone soit percé nativement, sans <code>::before</code>.<br>
+                 Pour cela, on utilise la règle du Winding Number (la règle de remplissage).</p>
+            <ol style="margin-left: 2rem; margin-bottom: 1rem;">
+                <li>Tu dessines le contour extérieur dans le <strong>Sens Horaire</strong>.</li>
+                <li>Tu crées une "fente" mathématique invisible vers l'intérieur.</li>
+                <li>Tu dessines le trou intérieur dans le <strong>Sens Anti-Horaire</strong>.</li>
+                <li>Tu ressors par ta fente.</li>
+            </ol>
+            
+            <p>Le navigateur calcule que "1 - 1 = 0", et vide magiquement le centre ! <br>
+                Le pseudo-élément <code>::before</code> disparaît du code CSS, tout tient dans le <code>::after</code>. <br>
+                Le résultat ? Une vraie transparence au centre et une ombre (<code>drop-shadow</code>) nette et tranchante qui projette toute la complexité de ta forme.</p>
+
+            <div class="dev-code">
+                [data-char="O"]::after {<br>
+                    clip-path: polygon(<br>
+                    /* Extérieur octogonal (Sens HORAIRE) */<br>
+                    var(--A-x3) var(--R1-y1),<br>
+                    var(--D-x2) var(--R1-y1),<br>
+                    var(--D-x4) var(--R1-y3),<br>
+                    /* ... On fait le tour complet ... */<br>
+                    var(--A-x3) var(--R1-y1),<br>
+                <br>
+                    /* LA FENTE (entrée) */<br>
+                    var(--B-x2) var(--R2-y2),<br>
+                <br>
+                    /* Trou carré (Sens ANTI-HORAIRE) */<br>
+                    var(--B-x2) var(--R3-y3),<br>
+                    var(--C-x3) var(--R3-y3),<br>
+                    var(--C-x3) var(--R2-y2),<br>
+                    var(--B-x2) var(--R2-y2),<br>
+                <br>
+                    /* LA FENTE (sortie) */<br>
+                    var(--A-x3) var(--R1-y1)<br>
+                    );<br>
+                }
+            </div>
+
+            <p>Le pouvoir de la contrainte et des maths. À toi de trouver les coordonnées de la lettre Z ! 
+                (et pour le A... oulala)<br>
+                Le niveau suivant te permettra de comprendre à quoi cela va servir. Et qu'est-ce qu'on peut faire avec.<br>
+                spoiler : t'imagines quoi ? ... le Morphing... mix-blend-mode: multiply;... </p>
+        </section>
