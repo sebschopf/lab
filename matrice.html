@@ -113,11 +113,13 @@ author: mous_tik
                 Avant de "dessiner", nous devons coder notre plan de travail. 
                 C'est ici que les Variables CSS (Custom Properties) vont être utiles.
                 Elles entrent en jeu pour créer notre système de coordonnées, sans les écrire.
-                En gros, elles vont automatiser la grille, je l'explique plus bas.</p>
+                En gros, elles vont automatiser la grille, je l'explique plus bas.
+            </p>
 
             <p>Puisque la propriété CSS <code>clip-path: polygon()</code> utilise 
             des paires de coordonnées (X et Y), il faut nommer les lignes comme sur 
-            un plateau de bataille navale :</p>
+            un plateau de bataille navale :
+            </p>
 
             <ul>
                 <li>L'axe X (Horizontal) : Les colonnes A, B, C et D.</li>
@@ -132,13 +134,13 @@ author: mous_tik
             C'est comme si on lui disait va à la colone 1 et avance de 2 puis va la ligne 2 et avance de 2.
             (pfiou, c'est chaud hein ?)
             </p>
-    </p>
-
+        
             <h3>L'Échafaudage Mathématique</h3>
 
             <p>Voici le code "racine" qui s'applique au conteneur de notre lettre. 
             C'est lui qui calcule tout seul les distances en fonction de la taille 
-            souhaitée et du ratio de la grille interne.</p>
+            souhaitée et du ratio de la grille interne.
+            </p>
 
             <div class="dev-code">
                 [data-matrice-char] {<br>
@@ -236,6 +238,7 @@ author: mous_tik
             }
             </div>
         </section>
+
         <section class="doc-section">
             <h2>3. la méta class [data-char] :<br> la sorcellerie pure et dure</h2>
                 <p>Maintenant qu'on l'explication de la structure, qu'on peut à peu prêt 
@@ -263,7 +266,7 @@ author: mous_tik
                 Et on va aller le voir de plus près.
                 </p>
             </div> 
-        </div>
+        </section>
 
         <section class="doc-section">
             <h2>4. La sculture artistique incomprise : clip-path: polygon()</h2>
@@ -275,7 +278,7 @@ author: mous_tik
             <code>clip-path</code> agit comme une paire de ciseaux sur une feuille de papier définie par 
             la propriété background. Qui est dans ? <code>[data-matrice-char]</code> ou si on veut être précis dans 
             <code>[data-matrice-char]::after</code>
-        </p>
+            </p>
 
             <p>Pourquoi cette approche ? Le "remplissage" de la lettre est totalement 
             indépendant de sa forme. Tu veux une lettre noire ? Les propriétés sont définies 
@@ -294,7 +297,7 @@ author: mous_tik
                     inset: 0;<br>
                     background: var(--bg, var(--clr-brand))/* La couleur de la lettre */<br>
                     /* clip-path défini lettre par lettre ci-dessous */<br>
-}
+                }
             </div>
         </section>
 
