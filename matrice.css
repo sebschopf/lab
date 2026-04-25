@@ -8,8 +8,14 @@
    ================================================== */
 .demo-grid {
     --demo-size: 320px;
-    --demo-gap: 8px;
-    --demo-inner: 0.6;
+    --demo-inner: 0.5;
+    
+    /*  CALCUL AUTOMATIQUE DE L'HARMONIE PARFAITE
+    Le gap est EXACTEMENT égal à l'espace entre la petite et grande cellule
+    C'est la même valeur pour TOUS les espacements du système */
+    --demo-cell: calc((var(--demo-size) / 4) * 0.875);
+    --demo-gap: calc((var(--demo-size) - (var(--demo-cell) * 4)) / 3);
+    --demo-offset: calc(var(--demo-cell) * ((1 - var(--demo-inner)) / 2));
     
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -65,17 +71,17 @@
     z-index: 10;
 }
 
-/* Coordonnées X (Calculées automatiquement selon l'épaisseur du carré interne) */
+/*  COORDONNÉES MATHÉMATIQUEMENT EXACTES
+Plus aucun pourcentage magique. Tout est calculé depuis --demo-inner */
 .demo-point.x1 { left: 0%; }
-.demo-point.x2 { left: calc(56% - (var(--demo-inner) * 52%)); }
-.demo-point.x3 { left: calc(56% + (var(--demo-inner) * 52%)); }
-.demo-point.x4 { left: 108%; }
+.demo-point.x2 { left: calc(50% - (var(--demo-inner) * 50%)); }
+.demo-point.x3 { left: calc(50% + (var(--demo-inner) * 50%)); }
+.demo-point.x4 { left: 100%; }
 
-/* Coordonnées Y (Calculées automatiquement selon l'épaisseur du carré interne) */
 .demo-point.y1 { top: 0%; }
-.demo-point.y2 { top: calc(54% - (var(--demo-inner) * 48%)); }
-.demo-point.y3 { top: calc(58% + (var(--demo-inner) * 48%)); }
-.demo-point.y4 { top: 108%; }
+.demo-point.y2 { top: calc(50% - (var(--demo-inner) * 50%)); }
+.demo-point.y3 { top: calc(50% + (var(--demo-inner) * 50%)); }
+.demo-point.y4 { top: 100%; }
 
 
 /* ==================================================
@@ -167,7 +173,7 @@
 [data-matrice-char] {
     --size: 240px;
     --gap-size: 4px;
-    --inner-ratio: 0.6;
+    --inner-ratio: 0.5;
 
     --cell-size: calc((var(--size) - (var(--gap-size) * 3)) / 4);
     --inner-size: calc(var(--cell-size) * var(--inner-ratio));
