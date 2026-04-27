@@ -1,0 +1,535 @@
+---
+layout: default
+title: "La Matrice Data-Driven"
+subtitle: "Comment un attribut HTML pilote toute la géométrie CSS sans JavaScript"
+level: 2
+tags: ["CSS", "Design", "Typographie", "Brutalisme", "Clip-path", "Data-attributes"]
+date: 2026-04-27
+author: mous_tik
+---
+
+<section class="doc-section">
+    <p><strong>Pour qui ?</strong> À toute personne
+    qui a lu l'article du concept de base sur
+    <a role="link"
+       aria-roledescription="lien vers le système de matrice 4×4"
+       href="./matrice.html">la Matrice 4×4</a>
+    (et qui se demande comment le navigateur sait quelle lettre dessiner
+    sans une seule ligne de JavaScript).</p>
+
+    <p><strong>Prérequis :</strong> comprendre le principe de
+    <code>clip-path: polygon()</code> et des variables CSS
+    <code>--A-x1</code> à <code>--D-x4</code>.
+    Si ces notions sont floues, commence par
+    <a role="link"
+       aria-roledescription="lien vers la page matrice"
+       href="./matrice.html">la page du concept de la matrice</a>.</p>
+
+    <p><strong>Ce qu'on revoit :</strong>
+    utiliser un attribut <code>data-*</code> comme signal CSS pour
+    sélectionner, configurer et afficher un composant entier,
+    une lettre.</p>
+</section>
+
+<section class="doc-section">
+    <h2>Table des matières</h2>
+
+    <ul>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section problème"
+            href="#probleme">1. Comment passer d'un
+            attribut à une forme ?</a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section concept"
+            href="#concept">2. L'attribut comme
+            source de vérité</a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section explication du code"
+            href="#code">3. Anatomie d'un composant
+            data-driven</a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section demo"
+            href="#demo">4. L'alphabet en action</a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section règles"
+            href="#regles">5. Les Règles</a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la conclusion"
+            href="#conclusion">6. Conclusion</a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la suite"
+            href="#suite">7. La Suite</a></li>
+    </ul>
+</section>
+
+<section class="doc-section">
+    <h2 id="probleme">1. Le Problème : comment passer d'un attribut
+    à une forme ?</h2>
+
+    <p>Dans la Matrice, chaque lettre est un polygone différent.
+    Le <strong>L</strong> est fait de 6 points, le <strong>N</strong>
+    de 10 points, le <strong>O</strong> de 16 points avec une fente
+    invisible. Comment dire au navigateur lequel afficher ?</p>
+
+    <p>Les solutions naïves ont toutes un défaut :</p>
+
+    <ul>
+        <li><strong>Une classe par lettre</strong> : on écrit
+        <code>.lettre-L</code>, <code>.lettre-N</code>, etc.
+        Ça fonctionne, mais la classe ne porte aucune <em>sémantique</em>.
+        On ne sait pas pourquoi ce style est appliqué.</li>
+        <li><strong>Un élément HTML par lettre</strong> : 26 éléments
+        différents pour 26 lettres. La maintenance devient un enfer.</li>
+    </ul>
+
+    <p>L'objectif est d'avoir <mark role="emphasis"
+    aria-roledescription="mise en évidence"
+    class="highlight">un seul type d'élément, un seul attribut,
+    26 formes possibles</mark>.</p>
+</section>
+
+<section class="doc-section">
+    <h2 id="concept">2. Le Concept : l'attribut comme source de
+    vérité</h2>
+
+    <p>RAPPEL : En HTML, un attribut <code>data-*</code> est une donnée
+    attachée à un élément. Le navigateur l'ignore pour le rendu,
+    mais CSS peut le lire avec le
+    <strong>sélecteur d'attribut</strong> <code>[attr="valeur"]</code>.</p>
+
+    <p>C'est exactement ce dont on a besoin : stocker la lettre
+    voulue dans le HTML, et laisser CSS décider de la forme
+    à afficher en fonction de cette valeur.</p>
+
+    <div class="dev-code">
+        &lt;!-- HTML : on déclare la donnée --&gt;<br>
+        &lt;div data-matrice-char="L"
+            role="img"
+            aria-label="Lettre L"&gt;
+        &lt;/div&gt;<br>
+        <br>
+        &lt;!-- CSS : on réagit à la donnée --&gt;<br>
+        [data-matrice-char="L"]::after {<br>
+        &nbsp;&nbsp;clip-path: polygon(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x1) var(--R1-y1), ...<br>
+        &nbsp;&nbsp;);<br>
+        }
+    </div>
+
+    <p>L'élément <code>&lt;div&gt;</code> est une coquille vide.
+    Sa seule responsabilité est de porter l'attribut
+    <code>data-matrice-char</code>. CSS fait le reste : il choisit
+    le bon <code>clip-path</code>, définit les variables de la
+    grille, et affiche la lettre via un pseudo-élément
+    <code>::after</code>.</p>
+
+    <p>C'est le principe <strong>data-driven</strong> : la
+    <em>donnée</em> (le caractère) pilote le <em>rendu</em>
+    (la géométrie), sans couche logique intermédiaire.</p>
+</section>
+
+<section class="doc-section">
+    <h2 id="code">3. Le Code : anatomie d'un composant
+    data-driven</h2>
+
+    <h3>la syntaxe</h3>
+
+    <p>Je me suis rendu compte que je n'ai pas vraiment expliqué le <code>[data-*]</code>. Le sélecteur d'attribut CSS s'écrit entre crochets.
+    La <em>valeur</em> doit correspondre exactement à l'attribut HTML :</p>
+
+    <div class="dev-code">
+        /* Sélecteur générique : tout élément portant
+           data-matrice-char, peu importe sa valeur */<br>
+        [data-matrice-char] { ... }<br>
+        <br>
+        /* Sélecteur spécifique : uniquement la lettre L */<br>
+        [data-matrice-char="L"]::after { ... }
+    </div>
+
+    <h3>les conditions d'utilisation</h3>
+
+    <p>On utilise <code>data-matrice-char</code> dès qu'un élément
+    HTML doit afficher une lettre de la Matrice. Une règle par
+    valeur possible, une seule source de vérité par lettre.</p>
+
+    <h3>l'implémentation complète</h3>
+
+    <p>Le composant se construit en trois couches CSS :</p>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">1</div>
+        <div>
+            <h3>variables et pseudo-élément</h3>
+            <p>Tous les éléments <code>[data-matrice-char]</code>
+            partagent les mêmes variables de grille et le même
+            pseudo-élément <code>::after</code> qui porte
+            la forme :</p>
+
+            <div class="dev-code">
+                [data-matrice-char] {<br>
+                &nbsp;&nbsp;--size: 240px;<br>
+                &nbsp;&nbsp;--offset: 12px;<br>
+                &nbsp;&nbsp;--bg: var(--clr-brand);<br>
+                <br>
+                &nbsp;&nbsp;/* Grille 4×4 dérivée de --offset */<br>
+                &nbsp;&nbsp;--cell-size: calc(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;(var(--size) - (3 * var(--offset))) / 4<br>
+                &nbsp;&nbsp;);<br>
+                &nbsp;&nbsp;--inner-size: calc(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--cell-size) - (2 * var(--offset))<br>
+                &nbsp;&nbsp;);<br>
+                <br>
+                &nbsp;&nbsp;/* Repères X — 4 colonnes × 4 points */<br>
+                &nbsp;&nbsp;--A-x1: 0px;<br>
+                &nbsp;&nbsp;--A-x2: var(--offset);<br>
+                &nbsp;&nbsp;--A-x3: calc(var(--cell-size) - var(--offset));<br>
+                &nbsp;&nbsp;--A-x4: var(--cell-size);<br>
+                &nbsp;&nbsp;/* ...idem pour B, C, D */<br>
+                <br>
+                &nbsp;&nbsp;width: var(--size);<br>
+                &nbsp;&nbsp;height: var(--size);<br>
+                &nbsp;&nbsp;position: relative;<br>
+                }<br>
+                <br>
+                [data-matrice-char]::after {<br>
+                &nbsp;&nbsp;content: "";<br>
+                &nbsp;&nbsp;position: absolute;<br>
+                &nbsp;&nbsp;inset: 0;<br>
+                &nbsp;&nbsp;background: var(--bg);<br>
+                &nbsp;&nbsp;/* clip-path défini par lettre */<br>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">2</div>
+        <div>
+            <h3>La couche spécifique : le polygone par lettre</h3>
+            <p>Chaque valeur d'attribut déclenche son propre
+            <code>clip-path</code>. Le sélecteur
+            <code>[data-matrice-char="X"]::after</code>
+            ne s'applique qu'à cette lettre précise.
+            Exemple avec le <strong>T</strong> :</p>
+
+            <div class="dev-code">
+                [data-matrice-char="T"]::after {<br>
+                &nbsp;&nbsp;clip-path: polygon(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;/* Barre horizontale */<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x1) var(--R1-y1),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x4) var(--R1-y1),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x4) var(--R1-y2),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--B-x3) var(--R1-y2),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;/* Fût central */<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--B-x3) var(--R4-y4),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--B-x2) var(--R4-y4),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--B-x2) var(--R1-y2),<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x1) var(--R1-y2)<br>
+                &nbsp;&nbsp;);<br>
+                }
+            </div>
+
+            <p>Aucune coordonnée n'est codée en dur. Tous les points
+            sont des variables CSS calculées depuis
+            <code>--offset</code>. Modifier une seule valeur
+            suffit à redessiner la lettre entière.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">3</div>
+        <div>
+            <h3>Les classes modificatrices</h3>
+            <p>La forme est figée par l'attribut.
+            La matière est libre : on la change avec une classe
+            CSS additionnelle sans toucher au polygone :</p>
+
+            <div class="dev-code">
+                /* Couleur analogue */<br>
+                [data-matrice-char].accent {<br>
+                &nbsp;&nbsp;--bg: var(--clr-analogue);<br>
+                }<br>
+                <br>
+                /* Fond inversé + ombre drop */<br>
+                [data-matrice-char].inverted {<br>
+                &nbsp;&nbsp;--bg: var(--clr-text);<br>
+                &nbsp;&nbsp;filter: drop-shadow(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;8px 8px 0 var(--clr-brand)<br>
+                &nbsp;&nbsp;);<br>
+                }<br>
+                <br>
+                /* Texture pointillée */<br>
+                [data-matrice-char].texture::after {<br>
+                &nbsp;&nbsp;background-image: radial-gradient(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--clr-text) 2px,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var(--clr-brand) 2px<br>
+                &nbsp;&nbsp;);<br>
+                &nbsp;&nbsp;background-size: 8px 8px;<br>
+                }
+            </div>
+        </div>
+    </div>
+
+    <h3>Pourquoi ce choix plutôt qu'un autre</h3>
+
+    <p>Un attribut <code>data-*</code> est une <strong>métadonnée
+    sémantique</strong>. Il décrit ce qu'est l'élément, pas comment
+    il doit s'afficher. CSS lit cette métadonnée et décide du rendu.
+    C'est une séparation nette des responsabilités :</p>
+
+    <div class="demo-legend">
+        <dl>
+            <dt>HTML</dt>
+            <dd>Porte la donnée : <code>data-matrice-char="A"</code>.
+            Porte l'accessibilité : <code>role="img"</code>,
+            <code>aria-label="Lettre A"</code>.</dd>
+
+            <dt>CSS</dt>
+            <dd>Réagit à la donnée. Calcule la géométrie.
+            Applique la matière (couleur, texture).</dd>
+
+            <dt>JavaScript</dt>
+            <dd>Absent. Il n'y a rien à orchestrer.
+            Le navigateur gère tout nativement.</dd>
+        </dl>
+    </div>
+</section>
+
+<section class="doc-section">
+    <h2 id="demo">4. Démo : l'alphabet en action</h2>
+
+    <p>Le même élément HTML, le même attribut, des valeurs
+    différentes. Chaque lettre ci-dessous n'est qu'un
+    <code>&lt;div data-matrice-char="X"&gt;</code> :</p>
+
+    <div class="grid">
+        <div class="demo-card">
+            <p><strong>Forme par défaut</strong></p>
+            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+                <div data-matrice-char="L"
+                     role="img"
+                     aria-label="Lettre L"></div>
+                <div data-matrice-char="T"
+                     role="img"
+                     aria-label="Lettre T"></div>
+                <div data-matrice-char="I"
+                     role="img"
+                     aria-label="Lettre I"></div>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <p><strong>Classe <code>.accent</code></strong></p>
+            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+                <div data-matrice-char="N"
+                     class="accent"
+                     role="img"
+                     aria-label="Lettre N accent"></div>
+                <div data-matrice-char="H"
+                     class="accent"
+                     role="img"
+                     aria-label="Lettre H accent"></div>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <p><strong>Classe <code>.inverted</code></strong></p>
+            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+                <div data-matrice-char="O"
+                     class="inverted"
+                     role="img"
+                     aria-label="Lettre O inversée"></div>
+                <div data-matrice-char="A"
+                     class="inverted"
+                     role="img"
+                     aria-label="Lettre A inversée"></div>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <p><strong>Classe <code>.texture</code></strong></p>
+            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+                <div data-matrice-char="M"
+                     class="texture"
+                     role="img"
+                     aria-label="Lettre M texture"></div>
+                <div data-matrice-char="B"
+                     class="texture"
+                     role="img"
+                     aria-label="Lettre B texture"></div>
+            </div>
+        </div>
+    </div>
+
+    <p>Le HTML de chaque démo est identique à une lettre près :</p>
+
+    <div class="dev-code">
+        &lt;div data-matrice-char="L"
+             role="img"
+             aria-label="Lettre L"&gt;&lt;/div&gt;
+    </div>
+
+    <p>Changer <code>"L"</code> en <code>"O"</code> change la forme.
+    Ajouter <code>class="inverted"</code> change la matière.
+    Les deux dimensions sont indépendantes et orthogonales.</p>
+</section>
+
+<section class="doc-section">
+    <h2 id="regles">5. Les Règles</h2>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">1</div>
+        <div>
+            <h3>Un attribut = une lettre, toujours</h3>
+            <p>La valeur de <code>data-matrice-char</code> est
+            exactement le caractère affiché.
+            Pas d'abréviation, pas de code arbitraire.
+            <code>data-matrice-char="A"</code> affiche un A.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">2</div>
+        <div>
+            <h3>Le rôle ARIA est obligatoire</h3>
+            <p>Un élément vide sans texte est invisible pour les
+            lecteurs d'écran. On ajoute systématiquement
+            <code>role="img"</code> et
+            <code>aria-label="Lettre X"</code>
+            Il serait temps que TOUT le monde le fasse (ptn).</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">3</div>
+        <div>
+            <h3>Zéro coordonnée codée en dur</h3>
+            <p>Chaque point du <code>clip-path</code> est une
+            variable CSS. Les valeurs brutes en pixels n'ont
+            pas leur place dans les polygones.
+            Si <code>--offset</code> change, tout se recalcule.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">4</div>
+        <div>
+            <h3>Forme et matière sont séparées</h3>
+            <p>L'attribut contrôle la forme via
+            <code>[data-matrice-char="X"]::after</code>.
+            La matière est contrôlée par une classe modificatrice
+            indépendante (<code>.accent</code>, <code>.inverted</code>,
+            <code>.texture</code>). Ces deux couches ne se mélangent
+            pas.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">5</div>
+        <div>
+            <h3>Aucun JavaScript</h3>
+            <p>La sélection de la forme, le calcul des coordonnées
+            et l'application des variantes sont entièrement réalisés
+            en CSS. Aucun script ne lit ou ne modifie l'attribut. <br>
+            je vais le répéter et le répéter encore.
+                Aucun JavaScript ne lit ou ne modifie l'attribut
+                <code>data-matrice-char</code>. Le navigateur gère tout
+                nativement. C'est la définition même du pattern
+                data-driven. </p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">6</div>
+        <div>
+            <h3>Les animations</h3>
+            <p>Si une animation est nécessaire sur le composant
+            (changement de couleur, apparition), elle utilise
+            Les même valeurs que n'importe quelle animation dans le CSS 
+            il faut ajouter une règle <code>steps()</code> comme timing function.
+            C'est expliqué et documenté à la fin, dans
+            <a role="link"
+               aria-roledescription="lien vers l'article typographie réactive"
+               href="./matrice-typographie-reactive.html">
+               l'article typographie réactive</a>.</p>
+        </div>
+    </div>
+</section>
+
+<section class="doc-section">
+    <h2 id="conclusion">6. Conclusion</h2>
+
+    <p>L'attribut <code>data-matrice-char</code> est une interface
+    entre le HTML et le CSS. Il dit <em>quoi</em> afficher.
+    CSS décide <em>comment</em>.</p>
+
+    <p>Ce pattern data-driven a trois avantages concrets :</p>
+
+    <ul>
+        <li><strong>Lisibilité</strong> : lire
+        <code>data-matrice-char="N"</code> dans le HTML suffit
+        pour savoir ce que l'élément représente, sans ouvrir
+        la feuille de style.</li>
+        <li><strong>Maintenabilité</strong> : pour ajouter une
+        lettre, on ajoute un seul bloc CSS. Pour la modifier,
+        on ne touche qu'à son sélecteur. Aucun autre élément
+        n'est impacté.</li>
+        <li><strong>Pérennité</strong> : les attributs
+        <code>data-*</code> et les sélecteurs CSS font partie
+        du standard HTML depuis 2014. Ce code fonctionnera
+        dans 20 ans.</li>
+    </ul>
+
+    <p><mark role="emphasis"
+    aria-roledescription="mise en évidence"
+    class="highlight">Un attribut. Un sélecteur. Une lettre.</mark></p>
+</section>
+
+<section class="doc-section">
+    <h2 id="suite">7. La Suite</h2>
+
+    <p>Ce pattern data-driven est la base sur laquelle
+    reposent les expériences suivantes :</p>
+
+    <ul>
+        <li>
+            <a role="link"
+               aria-roledescription="lien vers l'article typographie réactive"
+               href="./matrice-typographie-reactive.html">
+               Typographie Réactive
+            </a> — animer <code>--offset</code> pour faire muter
+            la graisse de chaque lettre en temps réel, avec
+            <code>@property</code> et zéro JavaScript.
+        </li>
+        <li>
+            <a role="link"
+               aria-roledescription="lien vers la page matrice"
+               href="./matrice.html">
+               La Matrice 4×4
+            </a> — le système de grille fondateur, les 256 points
+            d'ancrage, et la construction géométrique complète.
+        </li>
+    </ul>
+
+    <p>Les prochaines explorations possibles à partir de ce
+    système :</p>
+
+    <ul>
+        <li>Combiner <code>data-matrice-char</code> avec
+        <code>@counter-style</code> pour générer automatiquement
+        des titres en alphabet brutaliste.</li>
+        <li>Étendre la convention à d'autres systèmes de formes
+        (icônes, symboles mathématiques) avec le même mécanisme
+        d'attribut.</li>
+        <li>Créer une transition de forme entre deux lettres :
+        même nombre de points requis, mais c'est réalisable
+        avec <code>@property</code> sur chaque coordonnée.</li>
+    </ul>
+</section>
