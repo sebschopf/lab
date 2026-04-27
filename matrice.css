@@ -172,12 +172,15 @@ Plus aucun pourcentage magique. Tout est calculé depuis --demo-inner */
    ================================================== */
 [data-matrice-char] {
     --size: 240px;
-    --gap-size: 4px;
     --inner-ratio: 0.5;
 
-    --cell-size: calc((var(--size) - (var(--gap-size) * 3)) / 4);
+    /* ✅ HARMONIE ABSOLUE : UNE SEULE VALEUR POUR TOUS LES ESPACEMENTS
+    offset = gap-size. C'est la règle magique de la matrice.
+    On ne définit plus rien à la main, tout est calculé automatiquement */
+    --cell-size: calc(var(--size) / (4 + (3 * (1 - var(--inner-ratio)) )));
     --inner-size: calc(var(--cell-size) * var(--inner-ratio));
     --offset: calc((var(--cell-size) - var(--inner-size)) / 2);
+    --gap-size: var(--offset);
 
     display: grid;
     grid-template-columns: repeat(4, 1fr);
