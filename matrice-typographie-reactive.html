@@ -173,10 +173,10 @@ author: mous_tik
 
     <div class="typo-demo">
         <div class="typo-word">
-            <div data-matrice-char="L" title="L — fût + pied" aria-label="Lettre L" role="img"></div>
-            <div data-matrice-char="T" title="T — barre + fût" aria-label="Lettre T" role="img"></div>
-            <div data-matrice-char="I" class="accent" title="I — barre verticale" aria-label="Lettre I" role="img"></div>
-            <div data-matrice-char="C" class="inverted texture" title="C — arc ouvert" aria-label="Lettre C" role="img"></div>
+            <div data-matrice-char="L" title="L fût + pied" aria-label="Lettre L" role="img"></div>
+            <div data-matrice-char="T" title="T barre + fût" aria-label="Lettre T" role="img"></div>
+            <div data-matrice-char="I" class="accent" title=" I barre verticale" aria-label="Lettre I" role="img"></div>
+            <div data-matrice-char="C" class="inverted texture" title="C arc ouvert" aria-label="Lettre C" role="img"></div>
         </div>
     </div>
 </section>
@@ -188,9 +188,9 @@ author: mous_tik
 
     <div class="typo-demo">
         <div class="typo-word">
-            <div data-matrice-char="N" title="N — diagonale épaisse"></div>
-            <div data-matrice-char="H" title="H — barre transversale"></div>
-            <div data-matrice-char="M" class="accent" title="M — double pente"></div>
+            <div data-matrice-char="N" title="N diagonale épaisse"></div>
+            <div data-matrice-char="H" title="H barre transversale"></div>
+            <div data-matrice-char="M" class="accent" title="M double pente"></div>
         </div>
     </div>
 
@@ -281,14 +281,17 @@ author: mous_tik
             <dt><strong>B</strong> — 26 points (fentes / Non-Zero Winding)</dt>
             <dd>Construction : <em>deux trous indépendants</em>.
             Le polygone contient l'extérieur, le trou du haut et le trou du bas,
-            reliés par deux fentes invisibles. La lettre B est la plus dense de l'alphabet :
+            reliés par deux fentes invisibles. La lettre B est pour le moment celle que est la plus complexe à construire:
             chaque trou a son propre aller-retour de fente.</dd>
         </dl>
     </div>
 
     <p><strong>La règle qui unifie tout :</strong> le nombre de points n'a aucune importance.
     Chaque point s'accroche sur un repère de la matrice (x1, x2, x3, x4 × y1, y2, y3, y4).
-    La seule contrainte à respecter pour les lettres avec trou est <strong>la fente</strong> — voir section suivante.</p>
+    La seule contrainte à respecter pour les lettres avec trou est <strong>la fente</strong>.</p>
+    ATTENTION : On parle d'animation par modification de <code>--offset</code>. On ne parle pas de transition vers une seconde lettre.<br>
+    C'est possible mais cela va nécessiter des réglage puisque cela veut dire que chaque point doit être identiques par lettre...<br>
+    On y reviendra surement dans un prochain article.
 </section>
 
 <section class="doc-section">
@@ -325,12 +328,15 @@ author: mous_tik
     <p>La fente (Non-Zero Winding) reste donc la seule solution propre avec
     <code>clip-path: polygon()</code> : l'entrée et la sortie du trou passent
     par le même chemin, en sens opposé. Le navigateur les annule mathématiquement.</p>
+    <p>
+        On a testé avec des lettres toutes moches, maintenant on va essayer avec des lettres plus élaborés dans leurs découpages, pour voir...
+    </p>
 
     <div class="typo-demo">
         <div class="typo-word">
-            <div data-matrice-char="O" title="O — 1 trou avec fente"></div>
-            <div data-matrice-char="A" class="accent" title="A — 1 trou triangulaire"></div>
-            <div data-matrice-char="B" class="inverted" title="B — 2 trous indépendants"></div>
+            <div data-matrice-char="O" title="O un trou avec fente"></div>
+            <div data-matrice-char="A" class="accent" title="A un trou triangulaire"></div>
+            <div data-matrice-char="B" class="inverted" title="B deux trous indépendants"></div>
         </div>
     </div>
 
@@ -359,18 +365,18 @@ author: mous_tik
     qui exploite le comportement natif du HTML :</p>
 
     <div class="dev-code">
-        <!-- L'input est caché visuellement mais reste fonctionnel --><br>
-        <input type="checkbox" id="blackToggle" class="sr-only"><br>
+        &lt;!-- L'input est caché visuellement mais reste fonctionnel --&gt;<br>
+        &lt;input type="checkbox" id="blackToggle" class="sr-only"&gt;<br>
         <br>
-        <!-- Le label agit comme bouton (cliquable partout) --><br>
-        <label for="blackToggle" class="brutal-button">Mode Black</label><br>
+        &lt;!-- Le label agit comme bouton (cliquable partout) --&gt;<br>
+        &lt;label for="blackToggle" class="brutal-button"&gt;Mode Black&lt;/label&gt;<br>
         <br>
-        <!-- Le conteneur ciblé par le sélecteur CSS :checked --><br>
-        <div class="typo-demo">...lettres...</div>
+        &lt;!-- Le conteneur ciblé par le sélecteur CSS :checked --&gt;<br>
+        &lt;div class="typo-demo"&gt;...lettres...&lt;/div&gt;
     </div>
 
-    <p>Quand on clique sur le <code><label></code>, le navigateur coche
-    automatiquement l'<code><input></code> grâce à l'attribut <code>for</code>.
+    <p>Quand on clique sur le <code>&lt;label&gt;</code>, le navigateur coche
+    automatiquement l'<code>&lt;input&gt;</code> grâce à l'attribut <code>for</code>.
     Le CSS utilise alors le <strong>sélecteur de voisinage</strong> <code>~</code> :</p>
 
     <div class="dev-code">
@@ -387,7 +393,7 @@ author: mous_tik
         }
     </div>
 
-    <p>Le texte du bouton change aussi sans JS : deux <code><span></code> superposés
+    <p>Le texte du bouton change aussi sans JS : deux <code>&lt;span&gt;</code> superposés
     ("Activer" / "Désactiver"). On utilise la classe <code>.sr-only</code> plutôt que
     <code>display: none</code> pour que les lecteurs d'écran n'annoncent qu'un seul texte à la fois.</p>
 
@@ -409,10 +415,19 @@ author: mous_tik
 
         <div class="typo-demo" id="typoDemo">
             <div class="typo-word">
-                <div data-matrice-char="N" style="--bg: oklch(from var(--clr-brand) calc(var(--l-action) - 20%) calc(var(--c-neon) - 0.15) calc(var(--h-brand) - 60));"></div>
-                <div data-matrice-char="H" class="inverted"></div>
-                <div data-matrice-char="M" class="accent texture"></div>
-                <div data-matrice-char="O"></div>
+                <div 
+                data-matrice-char="N" 
+                style=
+                    "--bg:
+                        oklch(from
+                            var(--clr-brand) calc(var(--l-action) - 20%)
+                            calc(var(--c-neon) - 0.15)
+                            calc(var(--h-brand) - 60));"
+                role="img"
+                aria-label="Lettre N"></div>
+                <div data-matrice-char="H" class="inverted" role="img" aria-label="Lettre H"></div>
+                <div data-matrice-char="M" class="accent texture" role="img" aria-label="Lettre M"></div>
+                <div data-matrice-char="O" role="img" aria-label="Lettre O"></div>
             </div>
         </div>
     </div>
@@ -445,10 +460,10 @@ author: mous_tik
 
     <div class="typo-demo">
         <div class="typo-word">
-            <div data-matrice-char="L" title="Couleur par défaut (clr-brand)"></div>
-            <div data-matrice-char="L" class="accent" title="Couleur analogue (accent)"></div>
-            <div data-matrice-char="L" class="inverted" title="Fond noir, ombre rose"></div>
-            <div data-matrice-char="L" class="texture" title="Texture pointillée"></div>
+            <div data-matrice-char="L" title="Couleur par défaut (clr-brand)" role="img" aria-label="Couleur par défaut (clr-brand)"></div>
+            <div data-matrice-char="L" class="accent" title="Couleur analogue (accent)" role="img" aria-label="Couleur analogue (accent)"></div>
+            <div data-matrice-char="L" class="inverted" title="Fond noir, ombre rose" role="img" aria-label="Fond noir, ombre rose"></div>
+            <div data-matrice-char="L" class="texture" title="Texture pointillée" role="img" aria-label="Texture pointillée"></div>
         </div>
     </div>
 
@@ -459,14 +474,14 @@ author: mous_tik
     </div>
 
     <p>Même principe que sur la <a role="link" aria-roledescription="lien vers la page matrice" href="./matrice.html">page matrice</a> :
-    la forme reste intacte, seule la matière change. C'est le pouvoir de séparer
+    la forme reste intacte, seule la matière change. C'est le principe qui consiste à séparer
     le <strong>masque</strong> (<code>clip-path</code>) du <strong>remplissage</strong> (<code>background</code>).</p>
 </section>
 
 <section class="doc-section">
     <h2 id="accessibilite">9. Accessibilité et Robustesse</h2>
 
-    <p>Le système respecte les préférences utilisateurice :</p>
+    <p>Le système respecte les préférences de l'utilisateurice :</p>
 
     <div class="dev-code">
         @media (prefers-reduced-motion: reduce) {<br>
@@ -477,6 +492,7 @@ author: mous_tik
     <p>Si l'utilisateurice demande moins de mouvement, les transitions disparaissent
     instantanément. Les lettres changent toujours de graisse, mais sans animation.
     Le site reste pleinement fonctionnel.</p>
+    
 
     <div class="demo-legend">
         <dl>
@@ -494,4 +510,13 @@ author: mous_tik
             de la grille peut inverser les points dans les fentes.</dd>
         </dl>
     </div>
+    <p>Comme <code>[data-matrice-char]</code> est un élément HTML natif, il est reconnu par les technologies d'assistance.<br>
+    Il est donc possible de naviguer et d'interagir avec ces éléments de manière accessible.<br>
+    <code>data-matrice-char="M" class="accent texture" role="img" aria-label="Lettre M"</code>
+    J'ai ajouté un role d'<code>img</code> et une étiquette ARIA pour que les lecteurs d'écran annoncent la lettre correctement.<br>
+    Après, c'est ton choix, si tu décides de mettre des points pour faire un coeur, c'est toi qui vois. 
+    Là il est décidé d'en faire un ornement avec un role image.
+</p>
+<p> <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Bravo d'être arrivé jusqu'ici !</mark><<br>
+cadeau : <a href="/media/web_lab_media_matrice-A.png">La lettre A</a> </p>
 </section>
