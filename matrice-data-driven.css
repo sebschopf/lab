@@ -1,0 +1,380 @@
+/* ==========================================================================
+   MATRICE DATA-DRIVEN
+   matrice-data-driven.css | Styles exclusifs à matrice-data-driven.html
+   
+   Ce fichier illustre exactement ce que l'article explique :
+   comment un attribut data-* pilote la forme et la matière en CSS.
+   
+   Il s'appuie sur matrice.css (grille 4×4, lettres de base).
+   Il n'anticipe PAS les évolutions de matrice-typographie-reactive.css
+   (pas de @property, pas de transition --offset).
+   
+   Chaîne d'apprentissage :
+   matrice.css → matrice-data-driven.css → matrice-typographie-reactive.css
+   ========================================================================== */
+
+/* #region BASE COMMUNE — Grille 4×4 recalculée depuis --offset */
+
+/*
+   Différence avec matrice.css :
+   matrice.css utilise --inner-ratio pour calculer --offset.
+   Ici, --offset est la valeur directe (en px).
+   C'est plus lisible pour l'article et plus proche de
+   matrice-typographie-reactive.css qui sera lu ensuite.
+*/
+
+[data-matrice-char] {
+    --size: 240px;
+    --offset: 12px;
+    --bg: var(--clr-brand);
+
+    /* Grille 4×4 — tout est dérivé de --offset */
+    --gap-size: var(--offset);
+    --cell-size: calc((var(--size) - (3 * var(--offset))) / 4);
+    --inner-size: calc(var(--cell-size) - (2 * var(--offset)));
+
+    /* Repères X — colonne A */
+    --A-x1: 0;
+    --A-x2: var(--offset);
+    --A-x3: calc(var(--cell-size) - var(--offset));
+    --A-x4: var(--cell-size);
+
+    /* Repères X — colonne B */
+    --B-start: calc(var(--A-x4) + var(--gap-size));
+    --B-x1: var(--B-start);
+    --B-x2: calc(var(--B-start) + var(--offset));
+    --B-x3: calc(var(--B-start) + var(--cell-size) - var(--offset));
+    --B-x4: calc(var(--B-start) + var(--cell-size));
+
+    /* Repères X — colonne C */
+    --C-start: calc(var(--B-x4) + var(--gap-size));
+    --C-x1: var(--C-start);
+    --C-x2: calc(var(--C-start) + var(--offset));
+    --C-x3: calc(var(--C-start) + var(--cell-size) - var(--offset));
+    --C-x4: calc(var(--C-start) + var(--cell-size));
+
+    /* Repères X — colonne D */
+    --D-start: calc(var(--C-x4) + var(--gap-size));
+    --D-x1: var(--D-start);
+    --D-x2: calc(var(--D-start) + var(--offset));
+    --D-x3: calc(var(--D-start) + var(--cell-size) - var(--offset));
+    --D-x4: calc(var(--D-start) + var(--cell-size));
+
+    /* Repères Y — rangée 1 */
+    --R1-y1: 0;
+    --R1-y2: var(--offset);
+    --R1-y3: calc(var(--cell-size) - var(--offset));
+    --R1-y4: var(--cell-size);
+
+    /* Repères Y — rangée 2 */
+    --R2-start: calc(var(--R1-y4) + var(--gap-size));
+    --R2-y1: var(--R2-start);
+    --R2-y2: calc(var(--R2-start) + var(--offset));
+    --R2-y3: calc(var(--R2-start) + var(--cell-size) - var(--offset));
+    --R2-y4: calc(var(--R2-start) + var(--cell-size));
+
+    /* Repères Y — rangée 3 */
+    --R3-start: calc(var(--R2-y4) + var(--gap-size));
+    --R3-y1: var(--R3-start);
+    --R3-y2: calc(var(--R3-start) + var(--offset));
+    --R3-y3: calc(var(--R3-start) + var(--cell-size) - var(--offset));
+    --R3-y4: calc(var(--R3-start) + var(--cell-size));
+
+    /* Repères Y — rangée 4 */
+    --R4-start: calc(var(--R3-y4) + var(--gap-size));
+    --R4-y1: var(--R4-start);
+    --R4-y2: calc(var(--R4-start) + var(--offset));
+    --R4-y3: calc(var(--R4-start) + var(--cell-size) - var(--offset));
+    --R4-y4: calc(var(--R4-start) + var(--cell-size));
+
+    width: var(--size);
+    height: var(--size);
+    position: relative;
+
+    /* Ombre brutaliste : clip-path coupe les box-shadow standards.
+       On utilise filter: drop-shadow sur le conteneur. */
+    filter: drop-shadow(8px 8px 0 var(--clr-border));
+}
+
+[data-matrice-char]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    /* clip-path défini par lettre via [data-matrice-char="X"]::after */
+}
+
+/* #endregion */
+
+/* #region ALPHABET — clip-path par attribut */
+
+/* --- L : fût vertical + pied horizontal --- */
+[data-matrice-char="L"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R4-y3),
+        var(--A-x3) var(--R4-y3),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- I : barre verticale --- */
+[data-matrice-char="I"]::after {
+    clip-path: polygon(
+        var(--A-x2) var(--R1-y1),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x2) var(--R4-y4)
+    );
+}
+
+/* --- T : barre horizontale + fût central --- */
+[data-matrice-char="T"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x4) var(--R1-y2),
+        var(--B-x3) var(--R1-y2),
+        var(--B-x3) var(--R4-y4),
+        var(--B-x2) var(--R4-y4),
+        var(--B-x2) var(--R1-y2),
+        var(--A-x1) var(--R1-y2)
+    );
+}
+
+/* --- C : arc ouvert (3 côtés) --- */
+[data-matrice-char="C"]::after {
+    clip-path: polygon(
+        var(--D-x4) var(--R1-y1),
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R4-y3),
+        var(--A-x3) var(--R4-y3),
+        var(--A-x3) var(--R1-y2),
+        var(--D-x4) var(--R1-y2)
+    );
+}
+
+/* --- N : fûts + diagonale épaisse --- */
+[data-matrice-char="N"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--D-x2) var(--R1-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--A-x3) var(--R4-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x1) var(--R1-y1)
+    );
+}
+
+/* --- H : fûts + barre horizontale --- */
+[data-matrice-char="H"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R3-y3),
+        var(--D-x2) var(--R3-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x2) var(--R2-y2),
+        var(--A-x3) var(--R2-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- M : double pente --- */
+[data-matrice-char="M"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R2-y1),
+        var(--B-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+        var(--D-x2) var(--R2-y1),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--C-x1) var(--R3-y2),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- O : trou central avec fente (Non-Zero Winding) --- */
+[data-matrice-char="O"]::after {
+    clip-path: polygon(
+        /* Extérieur octogonal (Sens HORAIRE) */
+        var(--A-x3) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x4) var(--R1-y3),
+        var(--D-x4) var(--R4-y2),
+        var(--D-x2) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x1) var(--R4-y2),
+        var(--A-x1) var(--R1-y3),
+        var(--A-x3) var(--R1-y1),
+
+        /* Fente aller */
+        var(--B-x2) var(--R2-y2),
+
+        /* Trou intérieur octogonal (Sens ANTI-HORAIRE) */
+        var(--B-x2) var(--R3-y2),
+        var(--B-x3) var(--R3-y3),
+        var(--C-x2) var(--R3-y3),
+        var(--C-x3) var(--R3-y2),
+        var(--C-x3) var(--R2-y3),
+        var(--C-x2) var(--R2-y2),
+        var(--B-x3) var(--R2-y2),
+        var(--B-x2) var(--R2-y2),
+
+        /* Fente retour */
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- A : trou triangulaire avec fente (Non-Zero Winding) --- */
+[data-matrice-char="A"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R4-y4),
+        var(--A-x2) var(--R1-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x3) var(--R1-y2),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x1) var(--R4-y4),
+        var(--D-x1) var(--R4-y1),
+        var(--C-x4) var(--R3-y4),
+        var(--C-x4) var(--R3-y1),
+        var(--C-x4) var(--R2-y2),
+        var(--C-x3) var(--R1-y4),
+        var(--B-x2) var(--R1-y4),
+        var(--B-x1) var(--R2-y1),
+        var(--B-x1) var(--R3-y1),
+        var(--C-x4) var(--R3-y1),
+        var(--C-x4) var(--R3-y4),
+        var(--B-x1) var(--R3-y4),
+        var(--A-x4) var(--R4-y1),
+        var(--A-x4) var(--R4-y4),
+        var(--A-x1) var(--R4-y4)
+    );
+}
+
+/* --- B : deux trous avec fentes (Non-Zero Winding) --- */
+[data-matrice-char="B"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R4-y3),
+        var(--A-x1) var(--R1-y2),
+        var(--A-x2) var(--R1-y1),
+        var(--C-x3) var(--R1-y1),
+        var(--C-x4) var(--R1-y2),
+        var(--C-x4) var(--R2-y3),
+        var(--C-x3) var(--R2-y4),
+        var(--B-x4) var(--R2-y3),
+        var(--C-x1) var(--R2-y2),
+        var(--C-x1) var(--R1-y4),
+        var(--A-x4) var(--R1-y4),
+        var(--A-x4) var(--R2-y3),
+        var(--B-x4) var(--R2-y3),
+        var(--C-x3) var(--R2-y4),
+        var(--C-x3) var(--R3-y1),
+        var(--C-x4) var(--R3-y2),
+        var(--C-x4) var(--R4-y3),
+        var(--C-x3) var(--R4-y4),
+        var(--C-x1) var(--R4-y1),
+        var(--C-x1) var(--R3-y3),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x4) var(--R3-y2),
+        var(--A-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+        var(--C-x3) var(--R4-y4),
+        var(--A-x2) var(--R4-y4),
+        var(--A-x1) var(--R4-y3)
+    );
+}
+
+/* #endregion */
+
+/* #region VARIANTES DE MATIÈRE
+   C'est ici le cœur pédagogique de l'article :
+   l'attribut contrôle la forme, la classe contrôle la matière.
+   Les deux couches sont indépendantes. */
+
+/* Couleur analogue */
+[data-matrice-char].accent {
+    --bg: var(--clr-analogue);
+}
+
+/* Fond inversé + ombre drop brutaliste */
+[data-matrice-char].inverted {
+    --bg: var(--clr-text);
+    filter: drop-shadow(8px 8px 0 var(--clr-brand));
+}
+
+/* Texture pointillée */
+[data-matrice-char].texture::after {
+    background-image: radial-gradient(
+        circle,
+        var(--clr-text) 1.5px,
+        transparent 1.5px
+    );
+    background-size: var(--s-1) var(--s-1);
+}
+
+/* #endregion */
+
+/* #region LAYOUT DÉMOS */
+
+.typo-demo {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: var(--s-4) 0;
+    padding: var(--s-4);
+    border: 4px solid var(--clr-border);
+    background: var(--clr-surface);
+}
+
+.typo-word {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* #endregion */
+
+/* #region ACCESSIBILITÉ & RESPONSIVE */
+
+@media (max-width: 600px) {
+    [data-matrice-char] {
+        --size: 160px;
+    }
+    .typo-demo {
+        gap: 1rem;
+        padding: var(--s-3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-matrice-char] {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* #endregion */
