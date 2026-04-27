@@ -62,7 +62,7 @@
 
 /* #endregion */
 
-/* #region CHECKLIST CONTRASTE */
+/* #region CHECKLIST*/
 
 .checklist-item {
   display: flex;
@@ -202,7 +202,6 @@ nav {
   gap: var(--s-2);
   flex-wrap: wrap;
   margin-top: var(--s-3);
-
 }
 
 header nav a {
@@ -210,6 +209,52 @@ header nav a {
   min-width: min(100%, 180px);
   text-align: center;
 }
+
+/* #region NAV GROUPÉ */
+
+.nav-group {
+  flex: 1 1 min(100%, 160px);
+}
+
+.nav-group-summary {
+  width: 100%;
+  list-style: none;
+  cursor: pointer;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 900;
+}
+
+/* Supprime le triangle natif sur tous les navigateurs */
+.nav-group-summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-group[open] .nav-group-summary {
+  background: var(--clr-brand);
+}
+
+.nav-group-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  margin-top: var(--s-1);
+  padding: 0;
+}
+
+.nav-group-links li {
+  width: 100%;
+}
+
+.nav-group-links .brutal-button {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* #endregion */
 
 .doc-section {
  background: var(--clr-surface);

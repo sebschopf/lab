@@ -1,18 +1,40 @@
-<nav class="grid" style="margin-top: var(--s-3);">
-  {% for link in site.data.navigation %}
-    
-    {% assign is_active = false %}
-    {% if page.url == link.url %}
-      {% assign is_active = true %}
-    {% endif %}
+<nav aria-label="Navigation principale" style="margin-top: var(--s-3);">
 
-    <a 
-      href="{{ link.url | relative_url }}" 
-      class="brutal-button {% if is_active %}active{% endif %}"
-      {% if is_active %}aria-current="page"{% endif %}
-    >
-      {{ link.name }}
-    </a>
-    
+  {% assign groups = site.data.navigation | map: "group" | uniq %}
+
+  {% for group_name in groups %}
+
+    {% assign group_active = false %}
+    {% for link in site.data.navigation %}
+      {% if link.group == group_name and page.url == link.url %}
+        {% assign group_active = true %}
+      {% endif %}
+    {% endfor %}
+
+    <details {% if group_active %}open{% endif %} class="nav-group">
+      <summary class="nav-group-summary brutal-button">{{ group_name }}</summary>
+      <ul class="nav-group-links">
+        {% for link in site.data.navigation %}
+          {% if link.group == group_name %}
+
+            {% assign is_active = false %}
+            {% if page.url == link.url %}
+              {% assign is_active = true %}
+            {% endif %}
+
+            <li>
+              <a
+                href="{{ link.url | relative_url }}"
+                class="brutal-button {% if is_active %}active{% endif %}"
+                {% if is_active %}aria-current="page"{% endif %}
+              >{{ link.name }}</a>
+            </li>
+
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </details>
+
   {% endfor %}
+
 </nav>

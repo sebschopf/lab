@@ -1,26 +1,39 @@
 - name: principale
   url: /index.html
+  group: CSS
 
 - name: grille
   url: /grille.html
+  group: CSS
 
 - name: rythme
   url: /rythme.html
+  group: CSS
 
 - name: contraste
   url: /contrast.html
+  group: CSS
 
 - name: jerkyll
   url: /jerkyll.html
+  group: Architecture
 
 - name: nav
   url: /nav.html
+  group: Architecture
 
 - name: nav+
   url: /nav_round2.html
+  group: Architecture
 
 - name: matrice
   url: /matrice.html
+  group: Matrice
 
 - name: typo+
   url: /matrice-typographie-reactive.html
+  group: Matrice
+
+- name: data-driven
+  url: /matrice-data-driven.html
+  group: Matrice
