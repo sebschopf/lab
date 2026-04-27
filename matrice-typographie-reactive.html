@@ -1,0 +1,497 @@
+---
+layout: default
+title: "Typographie Réactive"
+subtitle: "Variable Font brutaliste et interactive, sans SVG"
+level: 2
+tags: ["CSS", "Design", "Typographie", "Brutalisme", "Clip-path", "Variable Font"]
+date: 2026-04-25
+author: mous_tik
+---
+
+<section class="doc-section">
+    <p><strong>Pré-requis :</strong> Cette expérience repose entièrement sur le
+    <a role="link" aria-roledescription="lien vers le système de matrice 4×4" href="./matrice.html">système de matrice 4×4</a>.
+    Si tu n'as pas lu l'article fondateur, les coordonnées <code>--A-x1</code> à <code>--D-x4</code>
+    et le principe du <code>clip-path</code> te sembleront incompréhensibles.</p>
+
+    <p>Cette page pousse le concept un cran plus loin : au lieu de dessiner des lettres
+    à épaisseur fixe, nous allons animer <strong>la matrice elle-même</strong>.
+    Une seule propriété <code>--offset</code> contrôle l'épaisseur du trait,
+    et le navigateur recalcule toute la géométrie des <strong>256 points d'ancrage</strong>
+    (16 repères sur l'axe X × 16 repères sur l'axe Y). Et ce, à 60 images par seconde s'il te plaît.</p>
+</section>
+
+<section class="doc-section">
+    <h2>Table des matières</h2>
+
+    <ul>
+        <li><a 
+            role="link"
+            aria-roledescription="lien vers la section problème SVG"
+            href="#probleme-svg">1. Le Problème : Est-ce qu'on peut animer ?
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section property offset"
+            href="#property-offset">2. Créer sa propre propriété : <code>@property --offset</code>
+        </a></li>
+        <li><a 
+            role="link"
+            aria-roledescription="lien vers la section démo survol"
+            href="#demo-survol">3. Démo : Survole pour voir la graisse muter
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section lettres complexes"
+            href="#lettres-complexes">4. Les Lettres Complexes : Diagonales et Trous
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section cartographie"
+            href="#cartographie">5. Cartographie : Quels points pour quelles constructions ?
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section fente invisible"
+            href="#fente-invisible">6. Le Secret des Trous : La Fente invisible
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section toggle CSS pur"
+            href="#toggle-css">7. Le Toggle CSS Pur
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section variantes de style"
+            href="#variantes">8. Variantes de Style
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section accessibilité et robustesse"
+            href="#accessibilite">9. Accessibilité et Robustesse
+        </a></li>
+    </ul>
+</section>
+
+<section class="doc-section">
+    <h2 id="probleme-svg">1. Le Problème : Est-ce qu'on peut animer ?</h2>
+
+    <p>Habituellement, pour animer l'épaisseur d'une typographie, deux solutions existent :</p>
+
+    <ul>
+        <li><strong>Variable Fonts</strong> : des fichiers de 200Ko+ contenant des axes de variation
+        (weight, width, etc.). Lourds, complexes, et toujours des fichiers externes.</li>
+        <li><strong>SVG + JavaScript</strong> : on manipule dynamiquement l'attribut <code>stroke-width</code>
+        ou les points du path. Mais le SVG est <em>statique</em> : une fois chargé,
+        sa géométrie est figée. Sans JS, pas d'animation.</li>
+    </ul>
+
+    <p>Notre ambition est différente : <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">aucun fichier externe, aucun JS,
+    juste du CSS et des maths</mark>. La forme n'est pas dessinée, elle est <strong>calculée</strong>. Pour de l'ornemental, cela pourrait le faire non ?</p>
+</section>
+
+<section class="doc-section">
+    <h2 id="property-offset">2. Créer sa propre propriété : <code>@property --offset</code></h2>
+
+    <p>Dans la <a role="link" aria-roledescription="lien vers la page matrice" href="./matrice.html">page matrice</a>, <code>--offset</code> est une valeur
+    fixe : c'est l'espace entre le bord extérieur de la cellule et le début du carré intérieur.
+    Cet espace, multiplié par 2, donne l'épaisseur du trait.</p>
+
+    <p>En CSS classique, les variables sont des <em>tokens de texte</em>.
+    Le navigateur ne sait pas interpoler <code>12px</code> vers <code>20px</code> pendant une transition.</p>
+
+    <p>La propriété <code>@property</code> (
+        <a role="link"
+        aria-roledescription="lien vers la documentation CSS Houdini"
+        href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@property">
+        CSS Houdini
+        </a>) permet d'enregistrer <code>--offset</code>
+    auprès du navigateur avec un type <strong>length</strong> :</p>
+
+    <div class="dev-code">
+        @property --offset {<br>
+        &nbsp;&nbsp;syntax: '&lt;length&gt;';<br>
+        &nbsp;&nbsp;inherits: true;<br>
+        &nbsp;&nbsp;initial-value: 12px;<br>
+        }
+    </div>
+
+    <div class="demo-legend">
+        <dl>
+            <dt><code>syntax: '&lt;length&gt;'</code></dt>
+            <dd>Le navigateur sait que c'est une longueur (px, em, etc.).
+            Il peut l'interpoler (12 → 20 → 21 px).</dd>
+
+            <dt><code>inherits: true</code></dt>
+            <dd>Les pseudo-éléments <code>::after</code> héritent de la valeur.
+            Quand <code>--offset</code> change, les <strong>256 points d'ancrage</strong>
+            de la matrice recalculent.</dd>
+
+            <dt><code>initial-value: 12px</code></dt>
+            <dd>Style "Light" par défaut. C'est notre graisse de départ.</dd>
+        </dl>
+    </div>
+
+    <p>Une fois enregistrée, <code>--offset</code> devient une <strong>propriété modifiable</strong> :</p>
+
+    <div class="dev-code">
+        [data-matrice-char] {<br>
+        &nbsp;&nbsp;--offset: 12px;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* Épaisseur Light */<br>
+        &nbsp;&nbsp;transition: --offset 0.4s cubic-bezier(0.25, 1, 0.5, 1);<br>
+        }<br>
+        [data-matrice-char]:hover {<br>
+        &nbsp;&nbsp;--offset: 20px;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* Au survol, Bold */<br>
+        }
+    </div>
+
+    <p>Le navigateur ne fait pas un fondu. À chaque frame de la transition,
+    il recalcule <strong>toutes les coordonnées</strong> de la matrice :</p>
+
+    <div class="dev-code">
+        --cell-size: calc((var(--size) - (3 * var(--offset))) / 4);<br>
+        --inner-size: calc(var(--cell-size) - (2 * var(--offset)));<br>
+        --A-x2: var(--offset);<br>
+        --A-x3: calc(var(--cell-size) - var(--offset));<br>
+        ...<br>
+        --R4-y3: calc(var(--R4-start) + var(--cell-size) - var(--offset));
+    </div>
+
+    <p>La variable <code>--offset</code> est le pivot central.
+    Elle contrôle le <strong>gap</strong> (espacement entre cellules), l'<strong>épaisseur du trait</strong>
+    (x2, y2, x3, y3), et indirectement la <strong>taille des cellules</strong>.
+    C'est du morphing géométrique natif, sans canvas, sans SVG, sans JS.</p>
+    <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">C'est de la typographie réactive de sorcelerie de malade !!!!</mark>
+</section>
+
+<section class="doc-section">
+    <h2 id="demo-survol">3. Démo : Survole pour voir la graisse muter</h2>
+
+    <p>Passe ta souris sur chaque lettre. La propriété <code>--offset</code> passe de 12px à 20px,
+    et toute la matrice se recalcule. Note l'ombre <code>filter: drop-shadow</code>
+    qui suit fidèlement la forme découpée — c'est normal puisque le navigateur
+    recalcule toutes les coordonnées à chaque frame :</p>
+
+    <div class="typo-demo">
+        <div class="typo-word">
+            <div data-matrice-char="L" title="L — fût + pied" aria-label="Lettre L" role="img"></div>
+            <div data-matrice-char="T" title="T — barre + fût" aria-label="Lettre T" role="img"></div>
+            <div data-matrice-char="I" class="accent" title="I — barre verticale" aria-label="Lettre I" role="img"></div>
+            <div data-matrice-char="C" class="inverted texture" title="C — arc ouvert" aria-label="Lettre C" role="img"></div>
+        </div>
+    </div>
+</section>
+
+<section class="doc-section">
+    <h2 id="lettres-complexes">4. Les Lettres Complexes : Diagonales et Trous</h2>
+
+    <p>La vraie force du système 4×4 apparaît sur les lettres complexes :</p>
+
+    <div class="typo-demo">
+        <div class="typo-word">
+            <div data-matrice-char="N" title="N — diagonale épaisse"></div>
+            <div data-matrice-char="H" title="H — barre transversale"></div>
+            <div data-matrice-char="M" class="accent" title="M — double pente"></div>
+        </div>
+    </div>
+
+    <p>Le <strong>N</strong> utilise une diagonale qui relie le coin intérieur du fût gauche
+    au coin intérieur du fût droit. Quand <code>--offset</code> augmente, la diagonale
+    s'épaissit proportionnellement sans jamais casser l'angle.</p>
+
+    <div class="dev-code">
+        [data-matrice-char="N"]::after {<br>
+        &nbsp;&nbsp;clip-path: polygon(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x1) var(--R1-y1),&nbsp;&nbsp;/* Haut fût gauche */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x1) var(--R4-y4),&nbsp;&nbsp;/* Bas fût gauche */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x3) var(--R4-y4),&nbsp;&nbsp;/* Pied gauche */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x2) var(--R1-y3),&nbsp;&nbsp;/* Diagonale : coin intérieur droit */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x2) var(--R4-y4),&nbsp;&nbsp;/* Bas fût droit */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x4) var(--R4-y4),&nbsp;&nbsp;/* Pied droit */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x4) var(--R1-y1),&nbsp;&nbsp;/* Haut fût droit */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--D-x2) var(--R1-y1),&nbsp;&nbsp;/* Retour intérieur droit */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x3) var(--R4-y2),&nbsp;&nbsp;/* Diagonale retour */<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;var(--A-x3) var(--R1-y1)&nbsp;&nbsp;&nbsp;/* Fermeture */<br>
+        &nbsp;&nbsp;);<br>
+        }
+    </div>
+</section>
+
+<section class="doc-section">
+    <h2 id="cartographie">5. Cartographie : Quels points pour quelles constructions ?</h2>
+
+    <p>Chaque lettre n'utilise qu'une fraction des <strong>256 points d'ancrage</strong>,
+    mais elle démontre une construction géométrique unique. Voici le catalogue :</p>
+
+    <div class="demo-legend">
+        <dl>
+            <dt><strong>L</strong> — 6 points</dt>
+            <dd><code>A-x1, A-x3, D-x4, R1-y1, R4-y3, R4-y4</code><br>
+            Construction : <em>fût vertical</em> + <em>pied horizontal</em>.
+            Tous les points sont alignés sur les bords. Pas de diagonale, pas de trou.</dd>
+
+            <dt><strong>I</strong> — 4 points</dt>
+            <dd><code>A-x2, A-x3, R1-y1, R4-y4</code><br>
+            Construction : <em>barre verticale isolée</em>.
+            Le fût n'occupe que le carré intérieur d'une seule cellule.</dd>
+
+            <dt><strong>T</strong> — 8 points</dt>
+            <dd><code>A-x1, B-x2, B-x3, D-x4, R1-y1, R1-y2, R4-y4</code><br>
+            Construction : <em>barre horizontale sur toute la largeur</em>
+            + <em>fût central</em>. La barre utilise les bords extérieurs (A-x1, D-x4),
+            le fût utilise les bords intérieurs (B-x2, B-x3).</dd>
+
+            <dt><strong>C</strong> — 8 points</dt>
+            <dd><code>A-x1, A-x3, D-x4, R1-y1, R1-y2, R4-y3, R4-y4</code><br>
+            Construction : <em>arc ouvert</em> (3 côtés d'un carré).
+            L'ouverture est créée en sautant un côté complet du polygone.</dd>
+
+            <dt><strong>N</strong> — 10 points</dt>
+            <dd><code>A-x1, A-x3, D-x2, D-x4, R1-y1, R1-y3, R4-y2, R4-y4</code><br>
+            Construction : <em>diagonale épaisse</em> entre deux fûts.
+            Les points <code>D-x2 R1-y3</code> et <code>A-x3 R4-y2</code> créent
+            une diagonale qui traverse 3 colonnes et 3 lignes.</dd>
+
+            <dt><strong>H</strong> — 12 points</dt>
+            <dd><code>A-x1, A-x3, D-x2, D-x4, R1-y1, R2-y2, R3-y3, R4-y4</code><br>
+            Construction : <em>barre transversale</em> à travers deux fûts.
+            La barre relie les bords intérieurs de la colonne A à ceux de la colonne D,
+            en traversant les lignes R2 et R3.</dd>
+
+            <dt><strong>M</strong> — 14 points</dt>
+            <dd><code>A-x1, A-x3, B-x4, C-x1, D-x2, D-x4, R1-y1, R2-y1, R2-y2, R3-y2, R4-y1, R4-y4</code><br>
+            Construction : <em>double pente</em> avec pieds asymétriques.
+            Les points <code>B-x4 R4-y1</code> et <code>C-x1 R4-y1</code> créent
+            un pied central large, tandis que les pentes montent vers <code>A-x3 R2-y1</code>
+            et <code>D-x2 R2-y1</code>.</dd>
+
+            <dt><strong>O</strong> — 16 points (fente / Non-Zero Winding)</dt>
+            <dd><code>A-x1, A-x3, D-x2, D-x4, B-x2, B-x3, C-x2, C-x3, R1-y1, R1-y3, R2-y2, R2-y3, R3-y2, R3-y3, R4-y2, R4-y4</code><br>
+            Construction : <em>trou unique octogonal</em>.
+            L'extérieur est un octogone (8 coins). Le trou intérieur est aussi un octogone
+            (8 coins sur les repères B et C × R2 et R3), parfaitement parallèle à l'extérieur.
+            La fente invisible pénètre depuis le coin sup-gauche et ressort par le même chemin.</dd>
+
+            <dt><strong>A</strong> — 10 points (fente / Non-Zero Winding)</dt>
+            <dd><code>A-x1, A-x2, B-x2, C-x3, D-x3, D-x4, R1-y1, R2-y2, R2-y3, R3-y3, R4-y4</code><br>
+            Construction : <em>trou triangulaire</em>.
+            La pointe est un segment étroit en haut (A-x2 à D-x3).
+            Le trou est un triangle inversé centré sur <code>B-x2 C-x3</code>.
+            La fente descend verticalement depuis le sommet intérieur.</dd>
+
+            <dt><strong>B</strong> — 26 points (fentes / Non-Zero Winding)</dt>
+            <dd>Construction : <em>deux trous indépendants</em>.
+            Le polygone contient l'extérieur, le trou du haut et le trou du bas,
+            reliés par deux fentes invisibles. La lettre B est la plus dense de l'alphabet :
+            chaque trou a son propre aller-retour de fente.</dd>
+        </dl>
+    </div>
+
+    <p><strong>La règle qui unifie tout :</strong> le nombre de points n'a aucune importance.
+    Chaque point s'accroche sur un repère de la matrice (x1, x2, x3, x4 × y1, y2, y3, y4).
+    La seule contrainte à respecter pour les lettres avec trou est <strong>la fente</strong> — voir section suivante.</p>
+</section>
+
+<section class="doc-section">
+    <h2 id="fente-invisible">6. Le Secret des Trous : La Fente invisible</h2>
+
+    <p>Découper un "L" avec un polygone est trivial. Mais comment percer le trou central
+    d'un "O" ou les deux trous d'un "B" sans que le polygone ne s'effondre ?</p>
+
+    <p>Dans ma première expérimentation, j'utilisais la <strong>fente</strong> :
+    tracer le contour extérieur dans un sens, créer une entaille invisible vers
+    l'intérieur, tracer le trou dans le <strong>sens inverse</strong>, ressortir
+    par la même fente. C'est la <em>Non-Zero Winding Rule</em>.<br>
+    La fente est invisible car elle est parcourue <strong>deux fois dans des sens
+    opposés</strong> : le navigateur calcule "1 − 1 = 0" et ne remplit pas cette ligne.</p>
+
+    <p>Pourquoi ne pas utiliser <code>evenodd</code> qui semble plus simple ?</p>
+
+    <div class="dev-code">
+        clip-path: polygon(evenodd,<br>
+        &nbsp;&nbsp;/* 1. Extérieur */<br>
+        &nbsp;&nbsp;var(--A-x3) var(--R1-y1)...<br>
+        <br>
+        &nbsp;&nbsp;/* 2. Trou */<br>
+        &nbsp;&nbsp;var(--B-x2) var(--R2-y2)...<br>
+        );
+    </div>
+
+    <p>Le problème : <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight"><code>polygon()</code> n'a pas de
+    commande <code>move-to</code></mark> comme en SVG. Le navigateur trace une
+    <strong>ligne de connexion</strong> entre la fin du contour extérieur et le
+    début du trou. Cette ligne traverse la matière de la lettre et crée un
+    angle visible qui la casse.</p>
+
+    <p>La fente (Non-Zero Winding) reste donc la seule solution propre avec
+    <code>clip-path: polygon()</code> : l'entrée et la sortie du trou passent
+    par le même chemin, en sens opposé. Le navigateur les annule mathématiquement.</p>
+
+    <div class="typo-demo">
+        <div class="typo-word">
+            <div data-matrice-char="O" title="O — 1 trou avec fente"></div>
+            <div data-matrice-char="A" class="accent" title="A — 1 trou triangulaire"></div>
+            <div data-matrice-char="B" class="inverted" title="B — 2 trous indépendants"></div>
+        </div>
+    </div>
+
+    <div class="demo-legend">
+        <dl>
+            <dt>La Fente</dt>
+            <dd>Une ligne parcourue <strong>deux fois dans des sens opposés</strong>
+            a une somme de remplissage de 0. Le navigateur l'efface : elle devient
+            une porte invisible vers le trou.</dd>
+
+            <dt>Non-Zero Winding</dt>
+            <dd>Contour extérieur dans un sens (+1), trou dans le sens inverse (−1).
+            À l'intérieur du trou : 1 − 1 = 0 → vide. Pas de <code>::before</code>,
+            pas de JS, juste des maths.</dd>
+        </dl>
+    </div>
+</section>
+
+<section class="doc-section">
+    <h2 id="toggle-css">7. Le Toggle CSS Pur : Comment on clique sans JavaScript</h2>
+
+    <p>Le LAB a un concept sacralisé : interdit d'utiliser JavaScript.
+    Comment faire un bouton "Activer le mode Ultra Black" sans <code>addEventListener</code> ?</p>
+
+    <p>La réponse est le <strong>Checkbox Hack</strong>, une technique CSS classique
+    qui exploite le comportement natif du HTML :</p>
+
+    <div class="dev-code">
+        <!-- L'input est caché visuellement mais reste fonctionnel --><br>
+        <input type="checkbox" id="blackToggle" class="sr-only"><br>
+        <br>
+        <!-- Le label agit comme bouton (cliquable partout) --><br>
+        <label for="blackToggle" class="brutal-button">Mode Black</label><br>
+        <br>
+        <!-- Le conteneur ciblé par le sélecteur CSS :checked --><br>
+        <div class="typo-demo">...lettres...</div>
+    </div>
+
+    <p>Quand on clique sur le <code><label></code>, le navigateur coche
+    automatiquement l'<code><input></code> grâce à l'attribut <code>for</code>.
+    Le CSS utilise alors le <strong>sélecteur de voisinage</strong> <code>~</code> :</p>
+
+    <div class="dev-code">
+        /* Quand la checkbox est cochée... */<br>
+        #blackToggle:checked ~ .typo-demo [data-matrice-char] {<br>
+        &nbsp;&nbsp;--offset: 21px;&nbsp;&nbsp;/* Toutes les lettres passent en Ultra Black */<br>
+        }<br>
+        <br>
+        /* ...le bouton s'enfonce visuellement */<br>
+        #blackToggle:checked ~ .typo-controls .brutal-button {<br>
+        &nbsp;&nbsp;background: var(--clr-brand);<br>
+        &nbsp;&nbsp;transform: translate(6px, 6px);<br>
+        &nbsp;&nbsp;box-shadow: 0 0 0 var(--clr-border);<br>
+        }
+    </div>
+
+    <p>Le texte du bouton change aussi sans JS : deux <code><span></code> superposés
+    ("Activer" / "Désactiver"). On utilise la classe <code>.sr-only</code> plutôt que
+    <code>display: none</code> pour que les lecteurs d'écran n'annoncent qu'un seul texte à la fois.</p>
+
+    <!-- ━━━ TOGGLE CSS PUR (Checkbox Hack) ━━━ -->
+    <div class="typo-interactive">
+        <input type="checkbox" id="blackToggle" class="sr-only">
+
+        <div class="typo-controls">
+            <label for="blackToggle" class="brutal-button">
+                <span class="txt-off">Activer le mode "Black"</span>
+                <span class="txt-on sr-only">Désactiver le mode "Black"</span>
+            </label>
+
+            <span class="typo-status">
+                <span class="txt-off">État : Light</span>
+                <span class="txt-on sr-only">État : Ultra Black</span>
+            </span>
+        </div>
+
+        <div class="typo-demo" id="typoDemo">
+            <div class="typo-word">
+                <div data-matrice-char="N" style="--bg: oklch(from var(--clr-brand) calc(var(--l-action) - 20%) calc(var(--c-neon) - 0.15) calc(var(--h-brand) - 60));"></div>
+                <div data-matrice-char="H" class="inverted"></div>
+                <div data-matrice-char="M" class="accent texture"></div>
+                <div data-matrice-char="O"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-legend">
+        <dl>
+            <dt>Clique le bouton</dt>
+            <dd>La checkbox se coche. Le sélecteur <code>:checked ~</code> s'active.
+            Toutes les lettres passent de <code>--offset: 12px</code> à <code>--offset: 21px</code>
+            en 0.4s. 21px est la limite physique de la grille avant que les trous
+            ne s'effondrent.</dd>
+
+            <dt>Re-clique</dt>
+            <dd>La checkbox se décoche. Retour à la graisse Light.
+            Aucun état n'est perdu au rechargement (c'est du HTML natif).</dd>
+
+            <dt>Pas de JS</dt>
+            <dd>Ce site fonctionnera dans 20 ans. Pas de dépendance, pas de build,
+            pas de framework. Juste un input HTML et un sélecteur CSS.</dd>
+        </dl>
+    </div>
+</section>
+
+<section class="doc-section">
+    <h2 id="variantes">8. Variantes de Style</h2>
+
+    <p>La matière de la lettre (couleur, texture) est totalement indépendante de sa forme.
+    Le <code>clip-path</code> découpe, le <code>background</code> remplit.
+    On peut donc superposer n'importe quel style :</p>
+
+    <div class="typo-demo">
+        <div class="typo-word">
+            <div data-matrice-char="L" title="Couleur par défaut (clr-brand)"></div>
+            <div data-matrice-char="L" class="accent" title="Couleur analogue (accent)"></div>
+            <div data-matrice-char="L" class="inverted" title="Fond noir, ombre rose"></div>
+            <div data-matrice-char="L" class="texture" title="Texture pointillée"></div>
+        </div>
+    </div>
+
+    <div class="dev-code">
+        [data-matrice-char].accent&nbsp;&nbsp;&nbsp;{ --bg: var(--clr-analogue); }<br>
+        [data-matrice-char].inverted { --bg: var(--clr-text); filter: drop-shadow(8px 8px 0 var(--clr-brand)); }<br>
+        [data-matrice-char].texture&nbsp;&nbsp;{ /* background-image: radial-gradient(...) */ }
+    </div>
+
+    <p>Même principe que sur la <a role="link" aria-roledescription="lien vers la page matrice" href="./matrice.html">page matrice</a> :
+    la forme reste intacte, seule la matière change. C'est le pouvoir de séparer
+    le <strong>masque</strong> (<code>clip-path</code>) du <strong>remplissage</strong> (<code>background</code>).</p>
+</section>
+
+<section class="doc-section">
+    <h2 id="accessibilite">9. Accessibilité et Robustesse</h2>
+
+    <p>Le système respecte les préférences utilisateurice :</p>
+
+    <div class="dev-code">
+        @media (prefers-reduced-motion: reduce) {<br>
+        &nbsp;&nbsp;[data-matrice-char] { transition: none; }<br>
+        }
+    </div>
+
+    <p>Si l'utilisateurice demande moins de mouvement, les transitions disparaissent
+    instantanément. Les lettres changent toujours de graisse, mais sans animation.
+    Le site reste pleinement fonctionnel.</p>
+
+    <div class="demo-legend">
+        <dl>
+            <dt><code>prefers-reduced-motion</code></dt>
+            <dd>Les transitions sont supprimées. Pas d'animation saccadée ni de vertige.</dd>
+
+            <dt><code>prefers-contrast: more</code></dt>
+            <dd>Hérité de <code>style.css</code>. Le texte s'agrandit à 120%.</dd>
+
+            <dt>Responsive</dt>
+            <dd>Sous 600px, les lettres passent de 240px à 160px. Le layout flex-wrap
+            s'adapte automatiquement. <code>--offset</code> reste en px, donc l'épaisseur
+            relative augmente : les lettres deviennent plus massives sur mobile.<br>
+            <strong>Limite connue :</strong> sur des écrans très étroits, la contraction
+            de la grille peut inverser les points dans les fentes.</dd>
+        </dl>
+    </div>
+</section>

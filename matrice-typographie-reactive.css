@@ -1,0 +1,471 @@
+/* ==========================================================================
+   TYPOGRAPHIE RÉACTIVE — Variable Font brutaliste en CSS pur
+   matrice-typographie-reactive.css | Fusion : matrice 4×4 + épaisseur animable
+   ========================================================================== */
+
+/* #region MATRICE ANIMÉE 4×4 — Base commune à toutes les lettres */
+
+@property --offset {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 12px;
+}
+
+[data-matrice-char] {
+    --size: 240px;
+
+    /* Épaisseur du trait (en px).
+       C'est la SEULE valeur à animer. Tout le reste est recalculé. */
+    --offset: 12px;       /* Style 'Light'  */
+    --offset-hover: 20px; /* Style 'Bold'   */
+    --offset-black: 21px; /* 'Ultra Black' (limite physique de la grille) */
+
+    --gap-size: var(--offset);
+    --cell-size: calc((var(--size) - (3 * var(--offset))) / 4);
+    --inner-size: calc(var(--cell-size) - (2 * var(--offset)));
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: var(--gap-size);
+    width: var(--size);
+    height: var(--size);
+    position: relative;
+    margin: 2rem auto;
+
+    /* OMBRE BRUTALISTE : clip-path coupe les box-shadow standards.
+       Il faut utiliser filter: drop-shadow sur le conteneur parent. */
+    filter: drop-shadow(8px 8px 0 var(--clr-border));
+
+    /* Transition de l'épaisseur. Le navigateur recalcule toute la
+       géométrie 60×/s pendant la transition. */
+    transition: --offset 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+[data-matrice-char]:hover {
+    --offset: var(--offset-hover);
+}
+
+/* ━━━ Axe X ━━━ */
+[data-matrice-char] {
+    --A-x1: 0;
+    --A-x2: var(--offset);
+    --A-x3: calc(var(--cell-size) - var(--offset));
+    --A-x4: var(--cell-size);
+
+    --B-start: calc(var(--A-x4) + var(--gap-size));
+    --B-x1: var(--B-start);
+    --B-x2: calc(var(--B-start) + var(--offset));
+    --B-x3: calc(var(--B-start) + var(--cell-size) - var(--offset));
+    --B-x4: calc(var(--B-start) + var(--cell-size));
+
+    --C-start: calc(var(--B-x4) + var(--gap-size));
+    --C-x1: var(--C-start);
+    --C-x2: calc(var(--C-start) + var(--offset));
+    --C-x3: calc(var(--C-start) + var(--cell-size) - var(--offset));
+    --C-x4: calc(var(--C-start) + var(--cell-size));
+
+    --D-start: calc(var(--C-x4) + var(--gap-size));
+    --D-x1: var(--D-start);
+    --D-x2: calc(var(--D-start) + var(--offset));
+    --D-x3: calc(var(--D-start) + var(--cell-size) - var(--offset));
+    --D-x4: calc(var(--D-start) + var(--cell-size));
+}
+
+/* ━━━ Axe Y ━━━ */
+[data-matrice-char] {
+    --R1-y1: 0;
+    --R1-y2: var(--offset);
+    --R1-y3: calc(var(--cell-size) - var(--offset));
+    --R1-y4: var(--cell-size);
+
+    --R2-start: calc(var(--R1-y4) + var(--gap-size));
+    --R2-y1: var(--R2-start);
+    --R2-y2: calc(var(--R2-start) + var(--offset));
+    --R2-y3: calc(var(--R2-start) + var(--cell-size) - var(--offset));
+    --R2-y4: calc(var(--R2-start) + var(--cell-size));
+
+    --R3-start: calc(var(--R2-y4) + var(--gap-size));
+    --R3-y1: var(--R3-start);
+    --R3-y2: calc(var(--R3-start) + var(--offset));
+    --R3-y3: calc(var(--R3-start) + var(--cell-size) - var(--offset));
+    --R3-y4: calc(var(--R3-start) + var(--cell-size));
+
+    --R4-start: calc(var(--R3-y4) + var(--gap-size));
+    --R4-y1: var(--R4-start);
+    --R4-y2: calc(var(--R4-start) + var(--offset));
+    --R4-y3: calc(var(--R4-start) + var(--cell-size) - var(--offset));
+    --R4-y4: calc(var(--R4-start) + var(--cell-size));
+}
+
+[data-matrice-char]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg, var(--clr-brand));
+    background-image: var(--texture, none);
+    background-size: none;
+}
+
+/* #endregion */
+
+/* #region ALPHABET RÉACTIF (clip-path) */
+
+/* --- N : fûts + diagonale épaisse --- */
+[data-matrice-char="N"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--D-x2) var(--R1-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--A-x3) var(--R4-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x1) var(--R1-y1)
+    );
+}
+
+/* --- H : fûts + barre horizontale --- */
+[data-matrice-char="H"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R3-y3),
+        var(--D-x2) var(--R3-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x2) var(--R2-y2),
+        var(--A-x3) var(--R2-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- M : double pente --- */
+[data-matrice-char="M"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R2-y1),
+        var(--B-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+        var(--D-x2) var(--R2-y1),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--C-x1) var(--R3-y2),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- L : fût vertical + pied horizontal --- */
+[data-matrice-char="L"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R4-y3),
+        var(--A-x3) var(--R4-y3),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- I : barre verticale --- */
+[data-matrice-char="I"]::after {
+    clip-path: polygon(
+        var(--A-x2) var(--R1-y1),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x2) var(--R4-y4)
+    );
+}
+
+/* --- T : barre horizontale + fût central --- */
+[data-matrice-char="T"]::after {
+    clip-path: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x4) var(--R1-y2),
+        var(--B-x3) var(--R1-y2),
+        var(--B-x3) var(--R4-y4),
+        var(--B-x2) var(--R4-y4),
+        var(--B-x2) var(--R1-y2),
+        var(--A-x1) var(--R1-y2)
+    );
+}
+
+/* --- C : arc ouvert (3 côtés) --- */
+[data-matrice-char="C"]::after {
+    clip-path: polygon(
+        var(--D-x4) var(--R1-y1),
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R4-y3),
+        var(--A-x3) var(--R4-y3),
+        var(--A-x3) var(--R1-y2),
+        var(--D-x4) var(--R1-y2)
+    );
+}
+
+/* --- O : trou central avec FENTE (Non-Zero Winding) --- */
+[data-matrice-char="O"]::after {
+    clip-path: polygon(
+        /* Extérieur octogonal (Sens HORAIRE) */
+        var(--A-x3) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x4) var(--R1-y3),
+        var(--D-x4) var(--R4-y2),
+        var(--D-x2) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x1) var(--R4-y2),
+        var(--A-x1) var(--R1-y3),
+        var(--A-x3) var(--R1-y1),
+
+        /* FENTE aller : depuis le coin sup-gauche extérieur vers le coin sup-gauche du trou */
+        var(--B-x2) var(--R2-y2),
+
+        /* Trou intérieur OCTOGONAL (Sens ANTI-HORAIRE) — 8 côtés comme l'extérieur */
+        var(--B-x2) var(--R3-y2),
+        var(--B-x3) var(--R3-y3),
+        var(--C-x2) var(--R3-y3),
+        var(--C-x3) var(--R3-y2),
+        var(--C-x3) var(--R2-y3),
+        var(--C-x2) var(--R2-y2),
+        var(--B-x3) var(--R2-y2),
+        var(--B-x2) var(--R2-y2),
+
+        /* FENTE retour : même chemin en sens inverse = invisible */
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- A : avec FENTE (Non-Zero Winding) --- */
+[data-matrice-char="A"]::after {
+    clip-path: polygon(
+        /* ━━━ CONTORNE EXTÉRIEUR (sens horaire) ━━━ */
+        var(--A-x1) var(--R4-y4),  /* point 1 : coin sup droit */
+        var(--A-x2) var(--R1-y2),  /* point 2 : bord int gauche rangée 1 */
+        var(--A-x3) var(--R1-y1),  /* point 3 : bord ext gauche rangée 1 */
+        var(--D-x2) var(--R1-y1),  /* point 4 : bord ext gauche rangée 4 */
+        var(--D-x3) var(--R1-y2),  /* point 5 : bord int gauche rangée 4 */
+        var(--D-x4) var(--R4-y4),  /* point 6 : coin inf droit */
+        var(--D-x1) var(--R4-y4),  /* point 7 : remontée droite */
+        var(--D-x1) var(--R4-y1),  /* point 8 : bord ext droit rangée 4 */
+        var(--C-x4) var(--R3-y4),  /* point 9 : bord int droit rangée 3 */
+
+        /* ━━━ FENTE ALLER ━━━ */
+        var(--C-x4) var(--R3-y1),  /* point 10 : bord int gauche rangée 3 */
+        var(--C-x4) var(--R2-y2),  /* point 11 : bord int gauche colonne B */
+        var(--C-x3) var(--R1-y4),  /* point 12 : bord ext colonne A rangée 3 */
+        var(--B-x2) var(--R1-y4),  /* point 13 : bord ext colonne A rangée 2 */
+        var(--B-x1) var(--R2-y1),  /* point 14 : bord int gauche colonne B rangée 2 */
+        var(--B-x1) var(--R3-y1),  /* point 15 : bord int gauche colonne C rangée 2 */
+        var(--C-x4) var(--R3-y1),  /* point 16 : RETOUR vers point 10 */
+
+        /* ━━━ FENTE RETOUR (même chemin sens inverse) ━━━ */
+        var(--C-x4) var(--R3-y4),  /* point 17 : RETOUR vers point 9 */
+        var(--B-x1) var(--R3-y4),  /* point 18 : bord int droit colonne C rangée 3 */ 
+        var(--A-x4) var(--R4-y1),  /* point 19 : bord ext droit rangée 4 */
+        var(--A-x4) var(--R4-y4),  /* point 20 : bord int droit rangée 2 */
+        var(--A-x1) var(--R4-y4)   /* point 21 : fermeture vers point 1 */
+    );
+}
+
+/* --- B : deux trous avec FENTES (Non-Zero Winding) --- */
+[data-matrice-char="B"]::after {
+    clip-path: polygon(
+        /* Extérieur rectangle (Sens ANTI-HORAIRE) */
+        var(--A-x1) var(--R4-y3),
+        var(--A-x1) var(--R1-y2),
+        var(--A-x2) var(--R1-y1),
+        var(--C-x3) var(--R1-y1),
+        var(--C-x4) var(--R1-y2),
+        var(--C-x4) var(--R2-y3),
+        var(--C-x3) var(--R2-y4),
+
+        /* FENTE 1 ALLER : invisible */
+        var(--B-x4) var(--R2-y3),
+        var(--C-x1) var(--R2-y2),
+        var(--C-x1) var(--R1-y4),
+        var(--A-x4) var(--R1-y4),
+        var(--A-x4) var(--R2-y3),
+        var(--B-x4) var(--R2-y3),
+
+        /* Retour au contour extérieur */
+        var(--C-x3) var(--R2-y4),
+        var(--C-x3) var(--R3-y1),
+        var(--C-x4) var(--R3-y2),
+        var(--C-x4) var(--R4-y3),
+        var(--C-x3) var(--R4-y4),
+
+        /* FENTE 2 ALLER : invisible */
+        var(--C-x1) var(--R4-y1),
+        var(--C-x1) var(--R3-y3),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x4) var(--R3-y2),
+        var(--A-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+
+        /* Fin du contour extérieur */
+        var(--C-x3) var(--R4-y4),
+        var(--A-x2) var(--R4-y4),
+        var(--A-x1) var(--R4-y3),
+        var(--A-x1) var(--R4-y3)
+    );
+}
+
+/* #endregion */
+
+/* #region DÉMONSTRATIONS & VARIANTES */
+
+.typo-demo {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: var(--s-4) 0;
+    padding: var(--s-4);
+    border: 4px solid var(--clr-border);
+    background: var(--clr-surface);
+}
+
+.typo-word {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Variant : couleur analogique */
+[data-matrice-char].accent {
+    --bg: var(--clr-analogue);
+}
+
+/* Variant : fond noir + ombre rose */
+[data-matrice-char].inverted {
+    --bg: var(--clr-text);
+    filter: drop-shadow(8px 8px 0 var(--clr-brand));
+}
+
+/* Variant : texture pointillée */
+[data-matrice-char].texture::after {
+    background-image: radial-gradient(circle, var(--clr-text) 1.5px, transparent 1.5px);
+    background-size: var(--s-1) var(--s-1);
+}
+
+/* #endregion */
+
+/* #region CONTRÔLES (Checkbox Hack — CSS pur, zero JS) */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.typo-controls {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: var(--s-4);
+}
+
+.brutal-button {
+    cursor: pointer;
+    user-select: none;
+}
+
+.brutal-button:focus-visible {
+    outline: 3px solid var(--clr-brand);
+    outline-offset: 6px;
+}
+
+/* Texte ON/OFF inversé par :checked */
+.brutal-button .txt-on,
+.typo-status .txt-on {
+    display: none;
+}
+
+/* Toggle actif : bouton enfoncé */
+#blackToggle:checked ~ .typo-controls .brutal-button {
+    background: var(--clr-brand);
+    color: var(--clr-text);
+    transform: translate(6px, 6px);
+    box-shadow: 0px 0px 0 var(--clr-border);
+}
+
+#blackToggle:checked ~ .typo-controls .brutal-button .txt-off,
+#blackToggle:checked ~ .typo-controls .typo-status .txt-off {
+    display: none;
+}
+
+#blackToggle:checked ~ .typo-controls .brutal-button .txt-on,
+#blackToggle:checked ~ .typo-controls .typo-status .txt-on {
+    display: inline;
+}
+
+/* Toggle actif : status inversé */
+#blackToggle:checked ~ .typo-controls .typo-status {
+    background: var(--clr-text);
+    color: var(--clr-surface);
+    box-shadow: 4px 4px 0 var(--clr-brand);
+}
+
+/* Toggle actif : TOUTES les lettres en Ultra Black */
+#blackToggle:checked ~ .typo-demo [data-matrice-char] {
+    --offset: var(--offset-black);
+}
+
+.typo-status {
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 900;
+    text-transform: uppercase;
+    padding: var(--s-2) var(--s-3);
+    border: 3px solid var(--clr-border);
+    background: var(--clr-surface);
+    box-shadow: 4px 4px 0 var(--clr-border);
+}
+
+/* #endregion */
+
+/* #region ACCESSIBILITÉ & RESPONSIVE */
+
+@media (max-width: 600px) {
+    [data-matrice-char] {
+        --size: 160px;
+    }
+    .typo-demo {
+        gap: 1rem;
+        padding: var(--s-3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-matrice-char],
+    .brutal-button,
+    .typo-status,
+    .typo-demo * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* #endregion */
