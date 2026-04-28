@@ -1,0 +1,205 @@
+<!-- Démo : lettres à taille variable pour voir le clamp() en action -->
+            <section class="doc-section">
+                <h2>Démo — Redimensionner pour voir</h2>
+                <p>Réduis la fenêtre ou le panneau. Les lettres adaptent leur graisse
+                   automatiquement via <code>clamp()</code> + <code>cqi</code>.</p>
+
+                <div class="typo-demo">
+                    <div class="typo-word">
+                        <div data-matrice-char="L"></div>
+                        <div data-matrice-char="A"></div>
+                        <div data-matrice-char="B"></div>
+                    </div>
+                </div>
+
+                <div class="typo-demo">
+                    <div data-matrice-char="O"></div>
+                    <div data-matrice-char="N" class="accent"></div>
+                    <div data-matrice-char="M" class="inverted"></div>
+                    <div data-matrice-char="C" class="texture"></div>
+                </div>
+
+                <!-- Lettre en petit conteneur : le clamp() protège la géométrie -->
+                <p>Même dans un conteneur étroit, la géométrie ne s'effondre pas :</p>
+                <div style="width: 120px; border: 3px dashed oklch(50% 0.2 330); padding: 8px;">
+                    <div data-matrice-char="H"></div>
+                </div>
+
+                <h3>Animations</h3>
+                <p>Survol → bold. Classes <code>.black</code>, <code>.pulse</code>, <code>.breathe</code>.</p>
+
+                <div class="typo-demo">
+                    <!-- Survol natif (transition --offset) -->
+                    <div>
+                        <p style="font-family:monospace;font-weight:900;text-align:center;margin-bottom:0.5rem;">:hover</p>
+                        <div data-matrice-char="T"></div>
+                    </div>
+
+                    <!-- Ultra Black statique -->
+                    <div>
+                        <p style="font-family:monospace;font-weight:900;text-align:center;margin-bottom:0.5rem;">.black</p>
+                        <div data-matrice-char="I" class="black"></div>
+                    </div>
+
+                    <!-- Pulse mécanique saccadé -->
+                    <div>
+                        <p style="font-family:monospace;font-weight:900;text-align:center;margin-bottom:0.5rem;">.pulse</p>
+                        <div data-matrice-char="L" class="pulse accent"></div>
+                    </div>
+
+                    <!-- Respiration lente fluide -->
+                    <div>
+                        <p style="font-family:monospace;font-weight:900;text-align:center;margin-bottom:0.5rem;">.breathe</p>
+                        <div data-matrice-char="O" class="breathe inverted"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contenu de l'article -->
+            <section class="doc-section">
+                <h2>Le Problème</h2>
+
+                <p>Rappel de la V1 : L'épaisseur du trait de la lettre, ainsi que les espaces vides
+                    de la grille, sont calculés à partir d'une seule variable : <code>--offset</code>.</p>
+
+                <p>En mode "Ultra Black", nous poussons cette valeur à <code>21px</code>. Sur une lettre
+                    affichée à <code>240px</code> de large, cela représente environ <strong>8.7%</strong>
+                    de l'espace total. La géométrie est stable, les trous s'évident correctement.</p>
+
+                <p><strong>L'implosion :</strong> Sur un écran mobile, si l'on contraint la lettre à
+                    faire <code>160px</code> de large, le <code>--offset</code> reste fixé à
+                    <code>21px</code>. L'épaisseur représente soudainement plus de <strong>13%</strong>
+                    de la boîte. L'espace mathématique vient à manquer. La somme de l'épaisseur des
+                    traits et des espaces vides (<code>gap</code>) devient supérieure à la largeur
+                    totale de la cellule.</p>
+
+                <p>Les coordonnées se percutent, l'axe X croise l'axe Y, et les points d'ancrage
+                    s'inversent. Résultat : les trous intérieurs s'effondrent sur eux-mêmes.
+                    La lettre est détruite.</p>
+
+                <p>Nous devons remplacer nos pixels morts par une unité proportionnelle.</p>
+
+                <ul>
+                    <li>Les pourcentages (<code>%</code>) sont instables dans les fonctions
+                        mathématiques complexes d'un <code>clip-path</code>.</li>
+                    <li>L'unité <code>vw</code> (Viewport Width) se base sur la fenêtre entière.
+                        Si notre lettre est dans une petite barre latérale, elle sera disproportionnée.</li>
+                </ul>
+
+                <p>La solution absolue est le <strong>CQI (Container Query Inline)</strong>.
+                    Cette unité représente 1% de la largeur du <em>conteneur le plus proche</em>.
+                    Couplée à la fonction mathématique native <code>clamp()</code>,
+                    elle permet de définir une graisse fluide, avec des limites de sécurité strictes.</p>
+            </section>
+
+            <section class="doc-section">
+                <h2>Le Concept</h2>
+
+                <div class="demo-legend">
+                    <dl>
+                        <dt>Quoi</dt>
+                        <dd>L'utilisation de la propriété <code>container-type</code> pour définir un
+                            contexte de mesure, associée à l'unité <code>cqi</code> et à la fonction
+                            de limitation <code>clamp(min, ideal, max)</code>.</dd>
+
+                        <dt>Quand</dt>
+                        <dd>Dès qu'une géométrie complexe, un espacement ou une typographie risque de
+                            se briser si elle n'évolue pas de manière strictement proportionnelle à la
+                            boîte qui la contient.</dd>
+
+                        <dt>Comment</dt>
+                        <dd>On transforme le composant en un conteneur physique, puis on remplace la
+                            valeur fixe en pixels par une formule <code>clamp()</code>.</dd>
+
+                        <dt>Pourquoi</dt>
+                        <dd>Pour éradiquer définitivement les Media Queries (<code>@media</code>) de
+                            la logique du composant. Le composant devient un organisme autonome qui
+                            "sait" quelle taille il fait et comment il doit s'auto-dessiner pour
+                            survivre.</dd>
+                    </dl>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <h2>Le Code</h2>
+
+                <div class="dev-code">
+                    /* 1. Déclaration du conteneur physique */<br>
+                    [data-matrice-char] {<br>
+                    &nbsp;&nbsp;/* La lettre devient son propre référentiel de mesure */<br>
+                    &nbsp;&nbsp;container-type: inline-size;<br>
+                    <br>
+                    &nbsp;&nbsp;/* 2. Le Garde-fou mathématique */<br>
+                    &nbsp;&nbsp;--offset-light-min:   4px;<br>
+                    &nbsp;&nbsp;--offset-light-ideal: 5cqi;<br>
+                    &nbsp;&nbsp;--offset-light-max:   12px;<br>
+                    <br>
+                    &nbsp;&nbsp;--offset-light: clamp(<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;var(--offset-light-min),<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;var(--offset-light-ideal),<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;var(--offset-light-max)<br>
+                    &nbsp;&nbsp;);<br>
+                    <br>
+                    &nbsp;&nbsp;/* 3. Injection dans le moteur géométrique */<br>
+                    &nbsp;&nbsp;--offset: var(--offset-light);<br>
+                    <br>
+                    &nbsp;&nbsp;/* 4. --glyph : la forme comme variable */<br>
+                    &nbsp;&nbsp;/* clip-path: var(--glyph) sur ::after */<br>
+                    }
+                </div>
+
+                <h3>Explication</h3>
+                <p>Sans JavaScript, et sans détecter la largeur de l'écran, le processus est autonome :</p>
+                <ol>
+                    <li>Le navigateur mesure la largeur physique de <code>[data-matrice-char]</code>.</li>
+                    <li>Il convertit : si la lettre fait <code>200px</code>, <code>1cqi</code> = <code>2px</code>.
+                        Donc <code>5cqi</code> = <code>10px</code>.</li>
+                    <li>Le <code>clamp()</code> valide : <code>10px</code> est entre <code>4px</code>
+                        et <code>12px</code>. ✓</li>
+                    <li>Il injecte <code>10px</code> dans <code>--offset</code>.</li>
+                    <li>La grille recalcule ses 256 coordonnées.</li>
+                    <li><code>clip-path: var(--glyph)</code> s'adapte sans jamais se briser.</li>
+                </ol>
+            </section>
+
+            <section class="doc-section">
+                <h2>Les Règles</h2>
+
+                <div class="checklist-item">
+                    <div class="checklist-number" aria-hidden="true">01</div>
+                    <div>
+                        <h3>Zéro Media Query Géométrique</h3>
+                        <p>Il est strictement interdit d'utiliser des <code>@media (max-width: ...)</code>
+                            pour modifier des proportions internes d'un composant complexe. Le
+                            redimensionnement géométrique doit être géré en interne via
+                            <code>container-type</code> / <code>cqi</code>.</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-number" aria-hidden="true">02</div>
+                    <div>
+                        <h3>Le principe de la borne (Clamp)</h3>
+                        <p>Ne déclare JAMAIS une valeur fluide (<code>cqi</code>, <code>vw</code>) de
+                            manière brute. Sécurise toujours avec
+                            <code>clamp(min, fluide, max)</code>.</p>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-number" aria-hidden="true">03</div>
+                    <div>
+                        <h3>Indépendance du Viewport</h3>
+                        <p>Un composant doit pouvoir être placé dans une page entière ou dans une
+                            colonne de 150px de large et se comporter parfaitement dans les deux cas.
+                            C'est le <mark class="highlight">design intrinsèque</mark>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="doc-section">
+                <p>Puisque la forme de la lettre est stockée dans une variable abstraite
+                    (<code>--glyph</code>), pourquoi la restreindre à un seul calque 2D ?
+                    Dans la prochaine expérience : extrusions isométriques, superpositions de
+                    trames, effets bien crades :D</p>
+            </section>

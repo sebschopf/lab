@@ -37,3 +37,7 @@
 - name: data-driven
   url: /matrice-data-driven.html
   group: Matrice
+
+- name: sqi
+  url: /matrice-sqi.html
+  group: Matrice

@@ -1,0 +1,496 @@
+/* ==========================================================================
+   MATRICE SQI — Polymorphisme Intrinsèque
+   matrice-sqi.css | Styles exclusifs à matrice-sqi.html
+
+   Innovation par rapport à matrice-data-driven.css :
+   - container-type: inline-size → la lettre est son propre référentiel
+   - --offset fluide avec clamp() paramétré par variables → zéro @media géométrique
+   - --glyph comme variable abstraite → forme et matière totalement séparées
+   - Animations via @property (Houdini) — interpolation native de --offset
+
+   Chaîne d'apprentissage :
+   matrice.css → matrice-data-driven.css → matrice-sqi.css → matrice-typographie-reactive.css
+   ========================================================================== */
+
+/* #region HOUDINI — Enregistrement de --offset comme propriété animable */
+
+/* Sans @property, le navigateur ne sait pas que --offset est une <length>.
+   Il ne peut donc pas interpoler entre deux valeurs.
+   Avec @property, la transition fonctionne. */
+/* --offset représente l'ESPACE VIDE entre le bord de cellule et le plein.
+   offset ↑ = vide plus grand = trait plus FIN (convention d'origine, cohérente avec matrice.css)
+
+   Pour raisonner en termes de graisse, utiliser --trait (variable calculée, lecture seule) :
+   --trait = cell-size - 2 × offset  →  trait ↑ quand offset ↓ */
+@property --offset {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 12px;
+}
+
+/* #endregion */
+
+/* -----------------------------------------------------------
+   #region BASE - Container - Grille 4×4 fluide
+   ----------------------------------------------------------- */
+
+[data-matrice-char] {
+    --size: 240px;
+
+    /* -----------------------------------------------------------
+       BORNES DU GARDE-FOU MATHÉMATIQUE
+       Chaque borne est une variable surchargeble indépendamment.
+       On peut modifier min, ideal ou max sans réécrire le clamp().
+       ----------------------------------------------------------- */
+
+    /* Mode Light */
+    --offset-light-min:   4px;    /* Limite physique de lisibilité */
+    --offset-light-ideal: 5cqi;   /* 5% de la largeur de la lettre */
+    --offset-light-max:   12px;   /* Graisse maximum désirée */
+
+    /* Mode Ultra Black */
+    --offset-black-min:   8px;
+    --offset-black-ideal: 8.75cqi;
+    --offset-black-max:   21px;
+
+    /* Calcul des offsets finaux */
+    --offset-light: clamp(
+        var(--offset-light-min),
+        var(--offset-light-ideal),
+        var(--offset-light-max)
+    );
+    --offset-black: clamp(
+        var(--offset-black-min),
+        var(--offset-black-ideal),
+        var(--offset-black-max)
+    );
+
+    /* Injection dans le moteur géométrique */
+    --offset: var(--offset-light);
+
+    /* Variable de lecture — épaisseur réelle du trait (informatif, non utilisé dans les polygones) */
+    --trait: calc(var(--cell-size) - 2 * var(--offset));
+
+    /* Couleur de remplissage par défaut */
+    --bg: var(--clr-brand);
+
+    /* Décalage de l'ombre, indépendant de --offset
+       (l'ombre est un effet visuel, pas une mesure géométrique) */
+    --shadow-offset: 8px;
+
+    /* Grille 4×4, tout est dérivé de --offset */
+    --gap-size: var(--offset);
+    --cell-size: calc((var(--size) - (3 * var(--offset))) / 4);
+
+    /* Repères X  colonne A */
+    --A-x1: 0px;
+    --A-x2: var(--offset);
+    --A-x3: calc(var(--cell-size) - var(--offset));
+    --A-x4: var(--cell-size);
+
+    /* Repères X  colonne B */
+    --B-start: calc(var(--A-x4) + var(--gap-size));
+    --B-x1: var(--B-start);
+    --B-x2: calc(var(--B-start) + var(--offset));
+    --B-x3: calc(var(--B-start) + var(--cell-size) - var(--offset));
+    --B-x4: calc(var(--B-start) + var(--cell-size));
+
+    /* Repères X  colonne C */
+    --C-start: calc(var(--B-x4) + var(--gap-size));
+    --C-x1: var(--C-start);
+    --C-x2: calc(var(--C-start) + var(--offset));
+    --C-x3: calc(var(--C-start) + var(--cell-size) - var(--offset));
+    --C-x4: calc(var(--C-start) + var(--cell-size));
+
+    /* Repères X  colonne D */
+    --D-start: calc(var(--C-x4) + var(--gap-size));
+    --D-x1: var(--D-start);
+    --D-x2: calc(var(--D-start) + var(--offset));
+    --D-x3: calc(var(--D-start) + var(--cell-size) - var(--offset));
+    --D-x4: calc(var(--D-start) + var(--cell-size));
+
+    /* Repères Y  rangée 1 */
+    --R1-y1: 0px;
+    --R1-y2: var(--offset);
+    --R1-y3: calc(var(--cell-size) - var(--offset));
+    --R1-y4: var(--cell-size);
+
+    /* Repères Y  rangée 2 */
+    --R2-start: calc(var(--R1-y4) + var(--gap-size));
+    --R2-y1: var(--R2-start);
+    --R2-y2: calc(var(--R2-start) + var(--offset));
+    --R2-y3: calc(var(--R2-start) + var(--cell-size) - var(--offset));
+    --R2-y4: calc(var(--R2-start) + var(--cell-size));
+
+    /* Repères Y  rangée 3 */
+    --R3-start: calc(var(--R2-y4) + var(--gap-size));
+    --R3-y1: var(--R3-start);
+    --R3-y2: calc(var(--R3-start) + var(--offset));
+    --R3-y3: calc(var(--R3-start) + var(--cell-size) - var(--offset));
+    --R3-y4: calc(var(--R3-start) + var(--cell-size));
+
+    /* Repères Y  rangée 4 */
+    --R4-start: calc(var(--R3-y4) + var(--gap-size));
+    --R4-y1: var(--R4-start);
+    --R4-y2: calc(var(--R4-start) + var(--offset));
+    --R4-y3: calc(var(--R4-start) + var(--cell-size) - var(--offset));
+    --R4-y4: calc(var(--R4-start) + var(--cell-size));
+
+    width: var(--size);
+    height: var(--size);
+    position: relative;
+
+    /* -----------------------------------------------------------
+       la lettre devient son propre référentiel de mesure
+       1cqi = 1% de la largeur de [data-matrice-char] lui-même 
+       ----------------------------------------------------------- */
+    container-type: inline-size;
+
+    /* Ombre brutaliste : clip-path coupe les box-shadow standards */
+    filter: drop-shadow(var(--shadow-offset) var(--shadow-offset) 0 var(--clr-border));
+
+    /* Transition fluide de l'épaisseur.
+       Le navigateur recalcule toute la géométrie pendant l'interpolation. */
+    transition: --offset 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+[data-matrice-char]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+
+    /* -----------------------------------------------------------
+       la forme est une variable, pas un style
+       --glyph est définie par lettre via [data-matrice-char="X"]
+       ----------------------------------------------------------- */
+    clip-path: var(--glyph);
+}
+
+/* #endregion */
+
+/* #region ALPHABET
+    -----------------------------------------------------------
+    --glyph par attribut (DRY : tracé stocké une seule fois)
+    -----------------------------------------------------------*/
+
+/* --- L : fût vertical + pied horizontal --- */
+[data-matrice-char="L"] {
+    --glyph: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--C-x3) var(--R4-y4),
+        var(--C-x3) var(--R4-y2),
+        var(--C-x2) var(--R4-y1),
+        var(--B-x1) var(--R4-y1),
+        var(--A-x4) var(--R3-y4),
+        var(--A-x4) var(--R1-y1)
+    );
+}
+
+/* --- I : barre verticale --- */
+[data-matrice-char="I"] {
+    --glyph: polygon(
+        var(--A-x2) var(--R1-y1),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x2) var(--R4-y4)
+    );
+}
+
+/* --- T : barre horizontale + fût = largeur d'une cellule (B-x2 → C-x3) avec biseaux --- */
+[data-matrice-char="T"] {
+    --glyph: polygon(
+        /* Barre haute, gauche → droite */
+        var(--A-x1) var(--R1-y1),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x4) var(--R1-y3), /* Biseau coin bas-droit de la barre */
+        var(--D-x3) var(--R1-y4),
+        var(--C-x3) var(--R1-y4), /* Descente vers le fût côté droit */
+        var(--C-x3) var(--R2-y1),
+        var(--C-x3) var(--R4-y3), /* Fût droit descend */
+        var(--C-x2) var(--R4-y4),
+        var(--B-x3) var(--R4-y4), /* Base du fût */
+        var(--B-x2) var(--R4-y3),
+        var(--B-x2) var(--R2-y1), /* Biseau coin bas-gauche du fût */
+        var(--B-x2) var(--R1-y4), /* Remontée côté gauche vers la barre */
+        var(--A-x2) var(--R1-y4), /* Biseau coin bas-gauche de la barre */
+        var(--A-x1) var(--R1-y3)
+    );
+}
+
+/* --- C : arc ouvert (3 côtés) --- */
+[data-matrice-char="C"] {
+    --glyph: polygon(
+        var(--C-x4) var(--R1-y1),
+        var(--A-x2) var(--R1-y1),
+        var(--A-x1) var(--R1-y2),
+        var(--A-x1) var(--R4-y3),
+        var(--A-x2) var(--R4-y4),
+        var(--C-x3) var(--R4-y4),
+        var(--C-x4) var(--R4-y3),
+        var(--C-x4) var(--R4-y2),
+        var(--C-x3) var(--R4-y1),
+        var(--A-x4) var(--R4-y1),
+        var(--A-x4) var(--R1-y4),
+        var(--C-x3) var(--R1-y4),
+        var(--C-x4) var(--R1-y3),
+        var(--C-x4) var(--R1-y2),
+        var(--C-x3) var(--R1-y1),
+        var(--C-x4) var(--R1-y1)
+    );
+}
+
+/* --- N : fûts + diagonale épaisse --- */
+[data-matrice-char="N"] {
+    --glyph: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--D-x2) var(--R1-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--A-x3) var(--R4-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--A-x1) var(--R1-y1)
+    );
+}
+
+/* --- H : fûts + barre horizontale --- */
+[data-matrice-char="H"] {
+    --glyph: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R3-y3),
+        var(--D-x2) var(--R3-y3),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x2) var(--R2-y2),
+        var(--A-x3) var(--R2-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- M : double pente --- */
+[data-matrice-char="M"] {
+    --glyph: polygon(
+        var(--A-x1) var(--R1-y1),
+        var(--A-x1) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x3) var(--R2-y1),
+        var(--B-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+        var(--D-x2) var(--R2-y1),
+        var(--D-x2) var(--R4-y4),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x4) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--C-x1) var(--R3-y2),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- O : trou central avec fente (Non-Zero Winding) --- */
+[data-matrice-char="O"] {
+    --glyph: polygon(
+        /* Extérieur octogonal (Sens HORAIRE) */
+        var(--A-x3) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x4) var(--R1-y3),
+        var(--D-x4) var(--R4-y2),
+        var(--D-x2) var(--R4-y4),
+        var(--A-x3) var(--R4-y4),
+        var(--A-x1) var(--R4-y2),
+        var(--A-x1) var(--R1-y3),
+        var(--A-x3) var(--R1-y1),
+        /* Fente aller */
+        var(--B-x2) var(--R2-y2),
+        /* Trou intérieur octogonal (Sens ANTI-HORAIRE) */
+        var(--B-x2) var(--R3-y2),
+        var(--B-x3) var(--R3-y3),
+        var(--C-x2) var(--R3-y3),
+        var(--C-x3) var(--R3-y2),
+        var(--C-x3) var(--R2-y3),
+        var(--C-x2) var(--R2-y2),
+        var(--B-x3) var(--R2-y2),
+        var(--B-x2) var(--R2-y2),
+        /* Fente retour */
+        var(--A-x3) var(--R1-y1)
+    );
+}
+
+/* --- A : trou triangulaire avec fente (Non-Zero Winding) --- */
+[data-matrice-char="A"] {
+    --glyph: polygon(
+        var(--A-x1) var(--R4-y4),
+        var(--A-x2) var(--R1-y2),
+        var(--A-x3) var(--R1-y1),
+        var(--D-x2) var(--R1-y1),
+        var(--D-x3) var(--R1-y2),
+        var(--D-x4) var(--R4-y4),
+        var(--D-x1) var(--R4-y4),
+        var(--D-x1) var(--R4-y1),
+        var(--C-x4) var(--R3-y4),
+        var(--C-x4) var(--R3-y1),
+        var(--C-x4) var(--R2-y2),
+        var(--C-x3) var(--R1-y4),
+        var(--B-x2) var(--R1-y4),
+        var(--B-x1) var(--R2-y1),
+        var(--B-x1) var(--R3-y1),
+        var(--C-x4) var(--R3-y1),
+        var(--C-x4) var(--R3-y4),
+        var(--B-x1) var(--R3-y4),
+        var(--A-x4) var(--R4-y1),
+        var(--A-x4) var(--R4-y4),
+        var(--A-x1) var(--R4-y4)
+    );
+}
+
+/* --- B : deux trous avec fentes (Non-Zero Winding) --- */
+[data-matrice-char="B"] {
+    --glyph: polygon(
+        var(--A-x1) var(--R4-y3),
+        var(--A-x1) var(--R1-y2),
+        var(--A-x2) var(--R1-y1),
+        var(--C-x3) var(--R1-y1),
+        var(--C-x4) var(--R1-y2),
+        var(--C-x4) var(--R2-y3),
+        var(--C-x3) var(--R2-y4),
+        var(--B-x4) var(--R2-y3),
+        var(--C-x1) var(--R2-y2),
+        var(--C-x1) var(--R1-y4),
+        var(--A-x4) var(--R1-y4),
+        var(--A-x4) var(--R2-y3),
+        var(--B-x4) var(--R2-y3),
+        var(--C-x3) var(--R2-y4),
+        var(--C-x3) var(--R3-y1),
+        var(--C-x4) var(--R3-y2),
+        var(--C-x4) var(--R4-y3),
+        var(--C-x3) var(--R4-y4),
+        var(--C-x1) var(--R4-y1),
+        var(--C-x1) var(--R3-y3),
+        var(--B-x4) var(--R3-y2),
+        var(--A-x4) var(--R3-y2),
+        var(--A-x4) var(--R4-y1),
+        var(--C-x1) var(--R4-y1),
+        var(--C-x3) var(--R4-y4),
+        var(--A-x2) var(--R4-y4),
+        var(--A-x1) var(--R4-y3)
+    );
+}
+
+/* #endregion */
+
+/* #region ANIMATIONS — États d'épaisseur */
+
+/* Survol : light → fin (offset ↑ = vide ↑ = trait ↓)
+   Pour un effet "bold au survol", on passe à --offset-light-min */
+[data-matrice-char]:hover {
+    --offset: var(--offset-light-min);
+}
+
+/* Classe statique Ultra Black = trait maximum = offset minimum */
+[data-matrice-char].black {
+    --offset: var(--offset-light-min);
+}
+
+/* Pulse mécanique (saccadé, brutaliste) — fin → épais → fin */
+@keyframes matrice-pulse {
+    0%   { --offset: var(--offset-light-max); }
+    50%  { --offset: var(--offset-light-min); }
+    100% { --offset: var(--offset-light-max); }
+}
+
+[data-matrice-char].pulse {
+    animation: matrice-pulse 2s steps(3) infinite;
+}
+
+/* Respiration lente (fluide) — fin → épais → fin */
+@keyframes matrice-breathe {
+    0%   { --offset: var(--offset-light-max); }
+    50%  { --offset: var(--offset-light-min); }
+    100% { --offset: var(--offset-light-max); }
+}
+
+[data-matrice-char].breathe {
+    animation: matrice-breathe 3s ease-in-out infinite;
+}
+
+/* #endregion */
+
+/* #region VARIANTES DE MATIÈRE
+   -----------------------------------------------------------
+   La forme (--glyph) et la matière (--bg / classes) sont orthogonales.
+   On peut combiner n'importe quelle lettre avec n'importe quelle variante.
+   ----------------------------------------------------------- */
+
+/* Couleur analogue */
+[data-matrice-char].accent {
+    --bg: var(--clr-analogue);
+}
+
+/* Fond inversé + ombre drop */
+[data-matrice-char].inverted {
+    --bg: var(--clr-text);
+    filter: drop-shadow(var(--shadow-offset) var(--shadow-offset) 0 var(--clr-brand));
+}
+
+/* Texture pointillée */
+[data-matrice-char].texture::after {
+    background-image: radial-gradient(
+        circle,
+        var(--clr-text) 1.5px,
+        transparent 1.5px
+    );
+    background-size: var(--s-1) var(--s-1);
+}
+
+/* #endregion */
+
+/* #region LAYOUT DÉMOS */
+
+.typo-demo {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: var(--s-4) 0;
+    padding: var(--s-4);
+    border: 4px solid var(--clr-border);
+    background: var(--clr-surface);
+}
+
+.typo-word {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* #endregion */
+
+/* #region ACCESSIBILITÉ
+    -----------------------------------------------------------
+   prefers-reduced-motion uniquement.
+   Pas de @media géométrique  c'est la règle conventionnelle de cet article.
+   Elle conditionne la désactivation de toutes les transitions et animations
+   sur les caractères, sans toucher à d'autres éléments de la page.
+   ----------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    [data-matrice-char] {
+        transition: none !important;
+        animation: none !important;
+        /* Ramène à l'état light statique */
+        --offset: var(--offset-light);
+    }
+}
+
+/* #endregion */
