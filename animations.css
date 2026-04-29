@@ -1,0 +1,177 @@
+/* ==========================================================================
+   ANIMATIONS — Onde Chromatique & Combinaisons
+   animations.css | Styles exclusifs à animations.html
+
+   Dépendances :
+   - style.css       → variables OKLCH, layout brutaliste (chargé par head.html)
+   - matrice-sqi.css → [data-matrice-char], --glyph, --offset, moteur géométrique
+
+   Concepts démontrés :
+   - @property (Houdini) pour animer --dynamic-h (teinte) nativement
+   - Onde chromatique staggerée lettre par lettre (animation-delay)
+   - Combinaisons : pulse épaisseur + onde couleur
+   ========================================================================== */
+
+@import url('matrice-sqi.css');
+
+/* ==========================================================================
+   1. HOUDINI — Enregistrement de --dynamic-h comme propriété animable
+   ========================================================================== */
+
+/* Sans @property, le navigateur traite --dynamic-h comme une chaîne opaque.
+   Il ne peut pas interpoler entre 330 et 690.
+   Avec @property + syntax: '<number>', l'interpolation est native. */
+
+@property --dynamic-h {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 330;
+}
+
+/* ==========================================================================
+   2. BRUTAL-WORD — Conteneur de mot en lettres matrice
+   ========================================================================== */
+
+.brutal-word {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2cqi;
+    margin: var(--s-4) 0;
+    padding: var(--s-3);
+    container-type: inline-size;
+    --size: clamp(40px, 12vw, 150px);
+}
+
+/* Chaque span hérite de [data-matrice-char] via l'attribut data-
+   On surcharge --size localement dans .brutal-word */
+.brutal-word > span {
+    display: block;
+    width: var(--size);
+    height: var(--size);
+    --offset-light-ideal: 4cqi;
+
+    /* L'ombre et le background sont connectés à la MÊME variable dynamique */
+    filter: drop-shadow(var(--shadow-offset) var(--shadow-offset) 0 oklch(40% var(--c-neon) var(--dynamic-h)));
+}
+
+/* Le polygone de chaque lettre lit la teinte animée */
+.brutal-word > span::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    clip-path: var(--glyph);
+    background: oklch(var(--l-action) var(--c-neon) var(--dynamic-h));
+}
+
+/* ==========================================================================
+   3. ONDE CHROMATIQUE — L'animation Houdini
+   ========================================================================== */
+
+/* Tour complet du cercle chromatique en partant de --h-brand */
+@keyframes hue-wave {
+    0%   { --dynamic-h: var(--h-brand); }
+    100% { --dynamic-h: calc(var(--h-brand) + 360); }
+}
+
+/* Application de l'onde.
+   steps(15) = saccadé, brutal. Passer à linear pour un fondu continu. */
+.brutal-word.chromatic-wave > span {
+    animation: hue-wave 4s infinite steps(15);
+}
+
+/* ── Le Stagger : décalage temporel lettre par lettre ──
+   Chaque lettre reçoit son propre instant de départ dans le cycle.
+   Le résultat : la couleur traverse le mot de gauche à droite
+   comme une onde physique. */
+.brutal-word.chromatic-wave > span:nth-child(1) { animation-delay: 0.0s; }
+.brutal-word.chromatic-wave > span:nth-child(2) { animation-delay: 0.2s; }
+.brutal-word.chromatic-wave > span:nth-child(3) { animation-delay: 0.4s; }
+.brutal-word.chromatic-wave > span:nth-child(4) { animation-delay: 0.6s; }
+.brutal-word.chromatic-wave > span:nth-child(5) { animation-delay: 0.8s; }
+.brutal-word.chromatic-wave > span:nth-child(6) { animation-delay: 1.0s; }
+.brutal-word.chromatic-wave > span:nth-child(7) { animation-delay: 1.2s; }
+.brutal-word.chromatic-wave > span:nth-child(8) { animation-delay: 1.4s; }
+
+/* ==========================================================================
+   4. COMBINAISONS — Épaisseur + Couleur
+   ========================================================================== */
+
+/* Onde lente et fluide (contraire du steps) */
+.brutal-word.chromatic-flow > span {
+    animation: hue-wave 6s infinite linear;
+}
+
+.brutal-word.chromatic-flow > span:nth-child(1) { animation-delay: 0.0s; }
+.brutal-word.chromatic-flow > span:nth-child(2) { animation-delay: 0.3s; }
+.brutal-word.chromatic-flow > span:nth-child(3) { animation-delay: 0.6s; }
+.brutal-word.chromatic-flow > span:nth-child(4) { animation-delay: 0.9s; }
+.brutal-word.chromatic-flow > span:nth-child(5) { animation-delay: 1.2s; }
+.brutal-word.chromatic-flow > span:nth-child(6) { animation-delay: 1.5s; }
+
+/* Combinaison : onde chromatique + pulse d'épaisseur matrice
+   Les deux animations tournent indépendamment, en parallèle */
+@keyframes hue-slow {
+    0%   { --dynamic-h: var(--h-brand); }
+    100% { --dynamic-h: calc(var(--h-brand) + 360); }
+}
+
+.brutal-word.chromatic-pulse > span {
+    animation:
+        hue-slow 8s infinite steps(6),
+        matrice-pulse 2s infinite steps(3);
+}
+
+.brutal-word.chromatic-pulse > span:nth-child(1) { animation-delay: 0s,   0.0s; }
+.brutal-word.chromatic-pulse > span:nth-child(2) { animation-delay: 0.4s, 0.2s; }
+.brutal-word.chromatic-pulse > span:nth-child(3) { animation-delay: 0.8s, 0.4s; }
+.brutal-word.chromatic-pulse > span:nth-child(4) { animation-delay: 1.2s, 0.6s; }
+.brutal-word.chromatic-pulse > span:nth-child(5) { animation-delay: 1.6s, 0.8s; }
+.brutal-word.chromatic-pulse > span:nth-child(6) { animation-delay: 2.0s, 1.0s; }
+
+/* ==========================================================================
+   5. LAYOUT DÉMOS
+   ========================================================================== */
+
+.anim-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    margin: var(--s-4) 0;
+}
+
+.anim-demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: flex-end;
+    padding: var(--s-3);
+    border: 3px dashed oklch(50% 0.15 var(--h-brand));
+    background: var(--clr-surface);
+}
+
+.anim-label {
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 900;
+    font-size: calc(var(--base) * pow(var(--ratio), -1));
+    text-transform: uppercase;
+    background: var(--clr-text);
+    color: var(--clr-surface);
+    padding: var(--s-1) var(--s-2);
+    margin-bottom: var(--s-2);
+    display: inline-block;
+}
+
+/* ==========================================================================
+   6. ACCESSIBILITÉ
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .brutal-word > span,
+    .brutal-word.chromatic-wave > span,
+    .brutal-word.chromatic-flow > span,
+    .brutal-word.chromatic-pulse > span {
+        animation: none !important;
+        --dynamic-h: var(--h-brand);
+    }
+}

@@ -1,0 +1,321 @@
+---
+layout: default
+title: "Animations Chromatiques"
+subtitle: "Animer la teinte OKLCH avec @property (Houdini) — onde, stagger, combinaisons"
+level: 3
+tags: ["CSS", "Animation", "OKLCH", "@property", "Houdini", "Matrice", "Brutalisme"]
+date: 2026-04-29
+author: mous_tik
+---
+
+<!-- --------------------------------------------------------------------------
+     1. INTRODUCTION
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>Introduction</h2>
+
+    <p><strong>Cela t'intéresse ?</strong> Cet article s'adresse à quelqu'un qui connaît
+       déjà les variables CSS (<code>--ma-variable</code>) et les animations
+       (<code>@keyframes</code>). La matrice de lettres polygonales n'est pas
+       un prérequis, mais elle sert de terrain de jeu.</p>
+
+    <p><strong>Prérequis :</strong> bases de CSS, notions d'OKLCH
+       (<a href="{{ '/' | relative_url }}">voir l'accueil du lab</a>),
+       lecture de
+       <a href="{{ 'matrice-sqi.html' | relative_url }}">Matrice SQI</a>
+       recommandée.</p>
+
+    <p><strong>L'expérience :</strong> Est-il facile et amusant 'animer une propriété
+        CSS custom de manière fluide et synchronisée ? Peut-on faire du CSS pur pour
+       créer un effet d'onde encapsulé sur un mot, et de combiner plusieurs
+       animations indépendantes sur un même élément.</p>
+</section>
+
+<!-- --------------------------------------------------------------------------
+     2. PROBLÉMATIQUE
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>Problématique</h2>
+
+    <p>On veut animer la couleur d'un mot lettre par lettre, il existe plusieurs façons de créer
+        des effets qui ressemblent à une onde chromatique qui traverse le texte de gauche à droite.
+        Chaque lettre doit avoir sa propre teinte à chaque instant.</p>
+
+    <p>Première tentative : animer <code>background-color</code> directement.
+       Ça fonctionne… mais l'ombre <code>drop-shadow</code> reste figée. C'est moche.
+       Les deux propriétés ne sont pas synchronisées et elles ne partagent pas la
+       même source de vérité (la teinte).</p>
+
+    <p>Deuxième tentative : stocker la teinte dans une variable CSS
+       <code>--dynamic-h</code> et l'animer dans un <code>@keyframes</code>.
+       Résultat : <strong>rien ne bouge</strong>. Le navigateur voit la variable
+       comme une chaîne de texte opaque. Il ne sait pas qu'il s'agit d'un nombre.
+       Il passe brutalement de la valeur de départ à la valeur d'arrivée, sans
+       interpoler. Mission accomplie ? Pas vraiment.</p>
+
+    <div class="dev-code">
+        /* Ce code ne produit PAS de transition */<br>
+        @keyframes hue-test {<br>
+        &nbsp;&nbsp;0%   { --dynamic-h: 330; }<br>
+        &nbsp;&nbsp;100% { --dynamic-h: 690; }<br>
+        }<br>
+        /* Le navigateur traite --dynamic-h comme du texte,<br>
+           pas comme un nombre. Zéro interpolation. */
+    </div>
+
+    <p>Sans un mécanisme pour typer la variable, l'animation de teinte
+       coordonnée entre plusieurs propriétés est impossible en CSS pur.</p>
+</section>
+
+<!-- --------------------------------------------------------------------------
+     3. EXPLICATION DU CONCEPT
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>Le Concept</h2>
+
+    <p>L'API <code>@property</code> (Houdini CSS) permet d'<strong>enregistrer
+       une propriété CSS custom avec un type</strong>. Une fois typée, le
+       navigateur peut interpoler entre deux valeurs exactement comme il le ferait
+       avec <code>width</code> ou <code>opacity</code>.</p>
+
+    <p>La syntaxe déclare trois choses :</p>
+
+    <ul>
+        <li><code>syntax</code> : le type de la valeur (<code>'&lt;number&gt;'</code>,
+            <code>'&lt;length&gt;'</code>, <code>'&lt;color&gt;'</code>…) on l'explique dans la page <a href="{{ 'matrice-data-driven.html' | relative_url }}">Syntaxe des propriétés CSS custom</a>.</li>
+        <li><code>inherits</code> : si la valeur se propage aux enfants</li>
+        <li><code>initial-value</code> : la valeur par défaut avant tout calcul</li>
+    </ul>
+
+    <p>Couplé à <code>oklch(L C H)</code>, on peut animer <code>H</code> (la
+       teinte) sur un tour complet du cercle chromatique (0 → 360). En OKLCH,
+       contrairement à HSL, la <strong>luminosité perçue reste constante</strong>
+       pendant ce tour. L'onde est propre, sans saut visuel.</p>
+
+    <p>Le <strong>stagger</strong> (décalage temporel) consiste à donner à chaque
+       lettre un <code>animation-delay</code> différent. Chaque élément joue la
+       même animation, mais à un instant décalé. Le résultat est une propagation
+       spatiale de la couleur — une onde.</p>
+</section>
+
+<!-- --------------------------------------------------------------------------
+     4. EXPLICATION DU CODE
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>Le Code</h2>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">Quoi</div>
+        <div>
+            <h3>L'API @property</h3>
+            <p>Une règle at-rule CSS qui enregistre une propriété custom avec
+               un type natif, permettant son interpolation par le moteur
+               d'animation.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">Quand</div>
+        <div>
+            <h3>Quand l'utiliser ?</h3>
+            <p>Dès qu'on veut animer une variable CSS de manière fluide —
+               particulièrement utile quand plusieurs propriétés (<code>filter</code>,
+               <code>background</code>, <code>border-color</code>…) doivent
+               réagir à la <strong>même valeur</strong> en temps réel.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">Comment</div>
+        <div>
+            <h3>Implémentation</h3>
+            <div class="dev-code">
+                /* 1. Typer la variable */<br>
+                @property --dynamic-h {<br>
+                &nbsp;&nbsp;syntax: '&lt;number&gt;';<br>
+                &nbsp;&nbsp;inherits: true;<br>
+                &nbsp;&nbsp;initial-value: 330;<br>
+                }<br><br>
+                /* 2. Animer la variable */<br>
+                @keyframes hue-wave {<br>
+                &nbsp;&nbsp;0%   { --dynamic-h: var(--h-brand); }<br>
+                &nbsp;&nbsp;100% { --dynamic-h: calc(var(--h-brand) + 360); }<br>
+                }<br><br>
+                /* 3. Connecter ombre + couleur à la MÊME variable */<br>
+                .brutal-word &gt; span {<br>
+                &nbsp;&nbsp;filter: drop-shadow(var(--shadow-offset) var(--shadow-offset) 0<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;oklch(40% var(--c-neon) var(--dynamic-h)));<br>
+                }<br>
+                .brutal-word &gt; span::after {<br>
+                &nbsp;&nbsp;background: oklch(var(--l-action) var(--c-neon) var(--dynamic-h));<br>
+                }<br><br>
+                /* 4. Appliquer l'animation avec stagger */<br>
+                .brutal-word.chromatic-wave &gt; span {<br>
+                &nbsp;&nbsp;animation: hue-wave 4s infinite steps(15);<br>
+                }<br>
+                .brutal-word.chromatic-wave &gt; span:nth-child(1) { animation-delay: 0.0s; }<br>
+                .brutal-word.chromatic-wave &gt; span:nth-child(2) { animation-delay: 0.2s; }<br>
+                /* … */
+            </div>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">Pourquoi</div>
+        <div>
+            <h3>Pourquoi ce choix ?</h3>
+            <p>Animer <code>background-color</code> directement ne synchronise
+               pas l'ombre. Animer une variable CSS sans <code>@property</code>
+               ne produit aucune interpolation. <code>@property</code> est le
+               seul mécanisme CSS natif qui résout les deux problèmes à la fois.</p>
+        </div>
+    </div>
+
+    <h3 style="margin-top: var(--s-4);">Démonstration</h3>
+    <p>Le mot COMBAT en onde chromatique saccadée (<code>steps(15)</code>) :</p>
+
+    <div class="brutal-word chromatic-wave" role="img" aria-label="COMBAT">
+        <span data-matrice-char="C" aria-hidden="true"></span>
+        <span data-matrice-char="O" aria-hidden="true"></span>
+        <span data-matrice-char="M" aria-hidden="true"></span>
+        <span data-matrice-char="B" aria-hidden="true"></span>
+        <span data-matrice-char="A" aria-hidden="true"></span>
+        <span data-matrice-char="T" aria-hidden="true"></span>
+    </div>
+
+    <p>Chaque polygone a sa propre teinte à chaque instant T. L'ombre
+       <code>drop-shadow</code> suit exactement la même équation OKLCH —
+       aucune désynchronisation possible car les deux lisent
+       <code>--dynamic-h</code>.</p>
+</section>
+
+<!-- --------------------------------------------------------------------------
+     5. RÈGLES
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>Les Règles</h2>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">01</div>
+        <div>
+            <h3>Toujours typer la variable avec @property</h3>
+            <p>Sans <code>syntax: '&lt;number&gt;'</code>, l'interpolation est
+               impossible. C'est le prérequis absolu. Une variable non typée
+               ne peut pas être animée de manière fluide.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">02</div>
+        <div>
+            <h3>Une seule variable = une seule source de vérité</h3>
+            <p>Toutes les propriétés visuelles liées à la même valeur (couleur,
+               ombre, bordure…) doivent lire la même variable. Ne jamais
+               dupliquer la valeur dans plusieurs propriétés indépendantes.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">03</div>
+        <div>
+            <h3>Préférer OKLCH pour les animations de teinte</h3>
+            <p>En HSL, un tour de cercle chromatique produit des sauts de
+               luminosité perçue. En OKLCH, la luminosité reste perceptuellement
+               constante. Pour une onde propre, OKLCH est obligatoire.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">04</div>
+        <div>
+            <h3>Respecter prefers-reduced-motion</h3>
+            <p>Toute animation doit être désactivée si l'utilisateur a activé
+               la préférence système de mouvement réduit. La règle
+               <code>@media (prefers-reduced-motion: reduce)</code> est
+               non négociable.</p>
+        </div>
+    </div>
+</section>
+
+<!-- --------------------------------------------------------------------------
+     6. CONCLUSION
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>Conclusion</h2>
+
+    <p><code>@property</code> transforme une variable CSS en donnée typée,
+       animable nativement par le moteur du navigateur. Combiné à OKLCH,
+       il permet des effets chromatiques fluides et perceptuellement cohérents,
+       sans JavaScript.</p>
+
+    <p>Les trois règles essentielles : <mark class="highlight">typer la variable</mark>,
+       <mark class="highlight">une seule source de vérité</mark>,
+       <mark class="highlight">OKLCH pour les teintes</mark>.</p>
+</section>
+
+<!-- --------------------------------------------------------------------------
+     7. LA SUITE (facultatif)
+     -------------------------------------------------------------------------- -->
+<section class="doc-section">
+    <h2>La Suite</h2>
+
+    <p>Quelques pistes à explorer depuis ici :</p>
+
+    <ul>
+        <li><strong>Variantes d'onde</strong> - saccadée (<code>steps</code>),
+            fluide (<code>linear</code>), ou combinée avec une animation
+            d'épaisseur matrice en parallèle. Voir les démos ci-dessous.</li>
+        <li><a href="{{ 'matrice-sqi.html' | relative_url }}">Matrice SQI</a>
+            - le moteur géométrique des lettres polygonales, avec
+            <code>@property --offset</code> pour animer l'épaisseur du trait.</li>
+        <li><a href="{{ 'matrice-typographie-reactive.html' | relative_url }}">Typographie Réactive</a>
+            - la prochaine étape : extrusions, superpositions, effets crades.</li>
+    </ul>
+
+    <h3 style="margin-top: var(--s-4);">Démos supplémentaires</h3>
+
+    <div class="anim-demo">
+
+        <div class="anim-demo-row">
+            <div>
+                <span class="anim-label">Flow · linear</span>
+                <div class="brutal-word chromatic-flow" role="img" aria-label="LAB">
+                    <span data-matrice-char="L" aria-hidden="true"></span>
+                    <span data-matrice-char="A" aria-hidden="true"></span>
+                    <span data-matrice-char="B" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="anim-demo-row">
+            <div>
+                <span class="anim-label">Pulse + Couleur</span>
+                <div class="brutal-word chromatic-pulse" role="img" aria-label="MAT">
+                    <span data-matrice-char="M" aria-hidden="true"></span>
+                    <span data-matrice-char="A" aria-hidden="true"></span>
+                    <span data-matrice-char="T" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="anim-demo-row">
+            <div>
+                <span class="anim-label">inverted + wave</span>
+                <div class="brutal-word chromatic-wave" role="img" style="--size: clamp(40px, 8vw, 100px);" aria-label="NOI">
+                    <span data-matrice-char="N" class="inverted" aria-hidden="true"></span>
+                    <span data-matrice-char="O" class="inverted" aria-hidden="true"></span>
+                    <span data-matrice-char="I" class="inverted" aria-hidden="true"></span>
+                </div>
+            </div>
+            <div>
+                <span class="anim-label">breathe + flow</span>
+                <div class="brutal-word chromatic-flow" role="img" style="--size: clamp(40px, 8vw, 100px);" aria-label="LAB">
+                    <span data-matrice-char="L" class="breathe" aria-hidden="true"></span>
+                    <span data-matrice-char="A" class="breathe" aria-hidden="true"></span>
+                    <span data-matrice-char="B" class="breathe" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
