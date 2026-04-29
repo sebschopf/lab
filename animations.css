@@ -50,7 +50,7 @@
     --size: inherit;
     width: var(--size);
     height: var(--size);
-    --offset-light-ideal: 2cqi;
+    --offset-light-ideal: calc(var(--cqi) / 2);
 
     /* L'ombre et le background sont connectés à la MÊME variable dynamique */
     filter: drop-shadow(var(--shadow-offset) var(--shadow-offset) 0 oklch(40% var(--c-neon) var(--dynamic-h)));
