@@ -26,11 +26,11 @@
   url: /nav_round2.html
   group: Architecture
 
-- name: L'origine de la matrice
+- name: matrice / origine
   url: /matrice-origine.html
   group: Matrice
 
-- name: typo+
+- name: matrice / typo+
   url: /matrice-typographie-reactive.html
   group: Matrice
 
@@ -38,6 +38,10 @@
   url: /matrice-data-driven.html
   group: Matrice
 
-- name: sqi
+- name: matrice /sqi
   url: /matrice-sqi.html
+  group: Matrice
+
+- name: matrice / anim.
+  url: /animations.html
   group: Matrice
