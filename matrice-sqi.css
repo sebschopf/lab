@@ -484,6 +484,14 @@
    sur les caractères, sans toucher à d'autres éléments de la page.
    ----------------------------------------------------------- */
 
+/* Focus visible — ADR-003 : les lettres sont focusables au clavier
+   quand elles sont dans un contexte interactif (tabindex, bouton…) */
+[data-matrice-char]:focus-visible {
+    outline: 3px solid var(--clr-brand);
+    outline-offset: 4px;
+    --offset: var(--offset-light-min); /* bold au focus, comme au survol */
+}
+
 @media (prefers-reduced-motion: reduce) {
     [data-matrice-char] {
         transition: none !important;

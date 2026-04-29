@@ -11,9 +11,7 @@ author: mous_tik
 <section class="doc-section">
     <p><strong>Pour qui ?</strong> À toute personne
     qui a lu l'article du concept de base sur
-    <a role="link"
-       aria-roledescription="lien vers le système de matrice 4×4"
-       href="./matrice.html">la Matrice 4×4</a>
+    <a href="{{ 'matrice.html' | relative_url }}">la Matrice 4×4</a>
     (et qui se demande comment le navigateur sait quelle lettre dessiner
     sans une seule ligne de JavaScript).</p>
 
@@ -21,9 +19,7 @@ author: mous_tik
     <code>clip-path: polygon()</code> et des variables CSS
     <code>--A-x1</code> à <code>--D-x4</code>.
     Si ces notions sont floues, commence par
-    <a role="link"
-       aria-roledescription="lien vers la page matrice"
-       href="./matrice.html">la page du concept de la matrice</a>.</p>
+    <a href="{{ 'matrice.html' | relative_url }}">la page du concept de la matrice</a>.</p>
 
     <p><strong>Ce qu'on revoit :</strong>
     utiliser un attribut <code>data-*</code> comme signal CSS pour
@@ -35,37 +31,13 @@ author: mous_tik
     <h2>Table des matières</h2>
 
     <ul>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la section problème"
-            href="#probleme">1. Comment passer d'un
-            attribut à une forme ?</a></li>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la section concept"
-            href="#concept">2. L'attribut comme
-            source de vérité</a></li>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la section explication du code"
-            href="#code">3. Anatomie d'un composant
-            data-driven</a></li>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la section demo"
-            href="#demo">4. L'alphabet en action</a></li>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la section règles"
-            href="#regles">5. Les Règles</a></li>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la conclusion"
-            href="#conclusion">6. Conclusion</a></li>
-        <li><a
-            role="link"
-            aria-roledescription="lien vers la suite"
-            href="#suite">7. La Suite</a></li>
+        <li><a href="#probleme">1. Comment passer d'un attribut à une forme ?</a></li>
+        <li><a href="#concept">2. L'attribut comme source de vérité</a></li>
+        <li><a href="#code">3. Anatomie d'un composant data-driven</a></li>
+        <li><a href="#demo">4. L'alphabet en action</a></li>
+        <li><a href="#regles">5. Les Règles</a></li>
+        <li><a href="#conclusion">6. Conclusion</a></li>
+        <li><a href="#suite">7. La Suite</a></li>
     </ul>
 </section>
 
@@ -89,9 +61,7 @@ author: mous_tik
         différents pour 26 lettres. La maintenance devient un enfer.</li>
     </ul>
 
-    <p>L'objectif est d'avoir <mark role="emphasis"
-    aria-roledescription="mise en évidence"
-    class="highlight">un seul type d'élément, un seul attribut,
+    <p>L'objectif est d'avoir <mark class="highlight">un seul type d'élément, un seul attribut,
     26 formes possibles</mark>.</p>
 </section>
 
@@ -312,7 +282,7 @@ author: mous_tik
     <div class="grid">
         <div class="demo-card">
             <p><strong>Forme par défaut</strong></p>
-            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+            <div class="typo-word">
                 <div data-matrice-char="L"
                      role="img"
                      aria-label="Lettre L"></div>
@@ -327,7 +297,7 @@ author: mous_tik
 
         <div class="demo-card">
             <p><strong>Classe <code>.accent</code></strong></p>
-            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+            <div class="typo-word">
                 <div data-matrice-char="N"
                      class="accent"
                      role="img"
@@ -341,7 +311,7 @@ author: mous_tik
 
         <div class="demo-card">
             <p><strong>Classe <code>.inverted</code></strong></p>
-            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+            <div class="typo-word">
                 <div data-matrice-char="O"
                      class="inverted"
                      role="img"
@@ -355,7 +325,7 @@ author: mous_tik
 
         <div class="demo-card">
             <p><strong>Classe <code>.texture</code></strong></p>
-            <div style="display:flex; gap: var(--s-2); flex-wrap: wrap;">
+            <div class="typo-word">
                 <div data-matrice-char="M"
                      class="texture"
                      role="img"
@@ -455,9 +425,7 @@ author: mous_tik
             Les même valeurs que n'importe quelle animation dans le CSS 
             il faut ajouter une règle <code>steps()</code> comme timing function.
             C'est expliqué et documenté à la fin, dans
-            <a role="link"
-               aria-roledescription="lien vers l'article typographie réactive"
-               href="./matrice-typographie-reactive.html">
+            <a href="{{ 'matrice-typographie-reactive.html' | relative_url }}">
                l'article typographie réactive</a>.</p>
         </div>
     </div>
@@ -487,9 +455,7 @@ author: mous_tik
         dans 20 ans.</li>
     </ul>
 
-    <p><mark role="emphasis"
-    aria-roledescription="mise en évidence"
-    class="highlight">Un attribut. Un sélecteur. Une lettre.</mark></p>
+    <p><mark class="highlight">Un attribut. Un sélecteur. Une lettre.</mark></p>
 </section>
 
 <section class="doc-section">
@@ -500,20 +466,16 @@ author: mous_tik
 
     <ul>
         <li>
-            <a role="link"
-               aria-roledescription="lien vers l'article typographie réactive"
-               href="./matrice-typographie-reactive.html">
+            <a href="{{ 'matrice-typographie-reactive.html' | relative_url }}">
                Typographie Réactive
-            </a> — animer <code>--offset</code> pour faire muter
+            </a> - animer <code>--offset</code> pour faire muter
             la graisse de chaque lettre en temps réel, avec
             <code>@property</code> et zéro JavaScript.
         </li>
         <li>
-            <a role="link"
-               aria-roledescription="lien vers la page matrice"
-               href="./matrice.html">
+            <a href="{{ 'matrice.html' | relative_url }}">
                La Matrice 4×4
-            </a> — le système de grille fondateur, les 256 points
+            </a> - le système de grille fondateur, les 256 points
             d'ancrage, et la construction géométrique complète.
         </li>
     </ul>

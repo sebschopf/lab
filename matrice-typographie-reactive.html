@@ -188,9 +188,9 @@ author: mous_tik
 
     <div class="typo-demo">
         <div class="typo-word">
-            <div data-matrice-char="N" title="N diagonale épaisse"></div>
-            <div data-matrice-char="H" title="H barre transversale"></div>
-            <div data-matrice-char="M" class="accent" title="M double pente"></div>
+            <div data-matrice-char="N" role="img" aria-label="Lettre N — diagonale épaisse" title="N diagonale épaisse"></div>
+            <div data-matrice-char="H" role="img" aria-label="Lettre H — barre transversale" title="H barre transversale"></div>
+            <div data-matrice-char="M" class="accent" role="img" aria-label="Lettre M — double pente" title="M double pente"></div>
         </div>
     </div>
 
@@ -224,61 +224,61 @@ author: mous_tik
 
     <div class="demo-legend">
         <dl>
-            <dt><strong>L</strong> — 6 points</dt>
+            <dt><strong>L</strong> - 6 points</dt>
             <dd><code>A-x1, A-x3, D-x4, R1-y1, R4-y3, R4-y4</code><br>
             Construction : <em>fût vertical</em> + <em>pied horizontal</em>.
             Tous les points sont alignés sur les bords. Pas de diagonale, pas de trou.</dd>
 
-            <dt><strong>I</strong> — 4 points</dt>
+            <dt><strong>I</strong> - 4 points</dt>
             <dd><code>A-x2, A-x3, R1-y1, R4-y4</code><br>
             Construction : <em>barre verticale isolée</em>.
             Le fût n'occupe que le carré intérieur d'une seule cellule.</dd>
 
-            <dt><strong>T</strong> — 8 points</dt>
+            <dt><strong>T</strong> - 8 points</dt>
             <dd><code>A-x1, B-x2, B-x3, D-x4, R1-y1, R1-y2, R4-y4</code><br>
             Construction : <em>barre horizontale sur toute la largeur</em>
             + <em>fût central</em>. La barre utilise les bords extérieurs (A-x1, D-x4),
             le fût utilise les bords intérieurs (B-x2, B-x3).</dd>
 
-            <dt><strong>C</strong> — 8 points</dt>
+            <dt><strong>C</strong> - 8 points</dt>
             <dd><code>A-x1, A-x3, D-x4, R1-y1, R1-y2, R4-y3, R4-y4</code><br>
             Construction : <em>arc ouvert</em> (3 côtés d'un carré).
             L'ouverture est créée en sautant un côté complet du polygone.</dd>
 
-            <dt><strong>N</strong> — 10 points</dt>
+            <dt><strong>N</strong> - 10 points</dt>
             <dd><code>A-x1, A-x3, D-x2, D-x4, R1-y1, R1-y3, R4-y2, R4-y4</code><br>
             Construction : <em>diagonale épaisse</em> entre deux fûts.
             Les points <code>D-x2 R1-y3</code> et <code>A-x3 R4-y2</code> créent
             une diagonale qui traverse 3 colonnes et 3 lignes.</dd>
 
-            <dt><strong>H</strong> — 12 points</dt>
+            <dt><strong>H</strong> - 12 points</dt>
             <dd><code>A-x1, A-x3, D-x2, D-x4, R1-y1, R2-y2, R3-y3, R4-y4</code><br>
             Construction : <em>barre transversale</em> à travers deux fûts.
             La barre relie les bords intérieurs de la colonne A à ceux de la colonne D,
             en traversant les lignes R2 et R3.</dd>
 
-            <dt><strong>M</strong> — 14 points</dt>
+            <dt><strong>M</strong> - 14 points</dt>
             <dd><code>A-x1, A-x3, B-x4, C-x1, D-x2, D-x4, R1-y1, R2-y1, R2-y2, R3-y2, R4-y1, R4-y4</code><br>
             Construction : <em>double pente</em> avec pieds asymétriques.
             Les points <code>B-x4 R4-y1</code> et <code>C-x1 R4-y1</code> créent
             un pied central large, tandis que les pentes montent vers <code>A-x3 R2-y1</code>
             et <code>D-x2 R2-y1</code>.</dd>
 
-            <dt><strong>O</strong> — 16 points (fente / Non-Zero Winding)</dt>
+            <dt><strong>O</strong> - 16 points (fente / Non-Zero Winding)</dt>
             <dd><code>A-x1, A-x3, D-x2, D-x4, B-x2, B-x3, C-x2, C-x3, R1-y1, R1-y3, R2-y2, R2-y3, R3-y2, R3-y3, R4-y2, R4-y4</code><br>
             Construction : <em>trou unique octogonal</em>.
             L'extérieur est un octogone (8 coins). Le trou intérieur est aussi un octogone
             (8 coins sur les repères B et C × R2 et R3), parfaitement parallèle à l'extérieur.
             La fente invisible pénètre depuis le coin sup-gauche et ressort par le même chemin.</dd>
 
-            <dt><strong>A</strong> — 10 points (fente / Non-Zero Winding)</dt>
+            <dt><strong>A</strong> - 10 points (fente / Non-Zero Winding)</dt>
             <dd><code>A-x1, A-x2, B-x2, C-x3, D-x3, D-x4, R1-y1, R2-y2, R2-y3, R3-y3, R4-y4</code><br>
             Construction : <em>trou triangulaire</em>.
             La pointe est un segment étroit en haut (A-x2 à D-x3).
             Le trou est un triangle inversé centré sur <code>B-x2 C-x3</code>.
             La fente descend verticalement depuis le sommet intérieur.</dd>
 
-            <dt><strong>B</strong> — 26 points (fentes / Non-Zero Winding)</dt>
+            <dt><strong>B</strong> - 26 points (fentes / Non-Zero Winding)</dt>
             <dd>Construction : <em>deux trous indépendants</em>.
             Le polygone contient l'extérieur, le trou du haut et le trou du bas,
             reliés par deux fentes invisibles. La lettre B est pour le moment celle que est la plus complexe à construire:
@@ -334,9 +334,9 @@ author: mous_tik
 
     <div class="typo-demo">
         <div class="typo-word">
-            <div data-matrice-char="O" title="O un trou avec fente"></div>
-            <div data-matrice-char="A" class="accent" title="A un trou triangulaire"></div>
-            <div data-matrice-char="B" class="inverted" title="B deux trous indépendants"></div>
+            <div data-matrice-char="O" role="img" aria-label="Lettre O — trou avec fente" title="O un trou avec fente"></div>
+            <div data-matrice-char="A" class="accent" role="img" aria-label="Lettre A — trou triangulaire" title="A un trou triangulaire"></div>
+            <div data-matrice-char="B" class="inverted" role="img" aria-label="Lettre B — deux trous indépendants" title="B deux trous indépendants"></div>
         </div>
     </div>
 

@@ -108,6 +108,25 @@ small { font-size: calc(var(--base) * pow(var(--ratio), -1)); }
 
 /* #region ACCESSIBILITE */
 
+/* ── Focus visible — ADR-003 : navigation clavier 100% fonctionnelle ──
+   Outline explicite sur tous les éléments interactifs.
+   On n'utilise pas :focus (trop large) mais :focus-visible (clavier uniquement). */
+
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--clr-brand);
+  outline-offset: 3px;
+}
+
+.brutal-button:focus-visible {
+  outline: 3px solid var(--clr-brand);
+  outline-offset: 3px;
+  /* On annule le transform du :active pour que l'outline reste visible */
+  transform: none;
+  box-shadow: 6px 6px 0 oklch(from var(--clr-brand) 0.5 c h);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

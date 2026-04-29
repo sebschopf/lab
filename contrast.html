@@ -26,7 +26,7 @@ author: mous_tik
      </p>
      <p>
       On n'écrit plus des couleurs. On écrit des
-      <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">RÈGLES</mark> de couleurs.
+      <mark class="highlight">RÈGLES</mark> de couleurs.
      </p>
      <p>
       Tu dis une seule fois : "si le fond est plus sombre que 50% de luminosité,
@@ -74,21 +74,21 @@ author: mous_tik
       Alors attention, je décortique :
      </p>
 
-     <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
-      <li> Déjà rappel from c'est pour récupérer la couleur qui nous intéresse pour changer les valeurs</li>
-      <li>Je déclare 3 sorte d'accent</li>
-      <li>Sur la variable <code>--bg</code>, je dit qu'il faut enlever
-        <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.3</mark> de <code>l</code> et
-        <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.3</mark> de <code>c</code> et
-        une petite transparence de <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">0.8</mark> (20% de transparence en gros)</li>
-      <li><mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">LE TRICK</mark> : 
+     <ul>
+      <li>Rappel : <code>from</code> récupère la couleur qui nous intéresse pour en changer les valeurs</li>
+      <li>Je déclare 3 sortes d'accent</li>
+      <li>Sur la variable <code>--bg</code>, je dis qu'il faut enlever
+        <mark class="highlight">0.3</mark> de <code>l</code> et
+        <mark class="highlight">0.3</mark> de <code>c</code> et
+        une petite transparence de <mark class="highlight">0.8</mark> (20% de transparence en gros)</li>
+      <li><mark class="highlight">LE TRICK</mark> : 
         OKLCH est calculé en fonction du résultat de <code>--bg</code>.</li>
       <li>Et pour finir on prend la teinte <code>h</code> 
-        exacte de fond sans la modifier.</li>
+        exacte du fond sans la modifier.</li>
      </ul>
 
      <p>
-      <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Résultat :</mark> tu peux choisir uniquement
+      <mark class="highlight">Résultat :</mark> tu peux choisir uniquement
        en changeant les variables pour choisir ton constraste.
        Tu peux faire du noir et blanc, du sombre,
        du clair, du rouge, du..... bref. Le contraste sera propre.
@@ -104,7 +104,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-base">
           <span>BASE 0°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"
           preserveAspectRatio="xMidYMid meet">
             <metadata>
               Created by potrace 1.15, written by Peter Selinger 2001-2017
@@ -145,7 +145,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-analogous">
           <span>+45°</span>
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+            <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 1280 1280" preserveAspectRatio="xMidYMid meet">
               <metadata>
                 Created by potrace 1.15, written by Peter Selinger 2001-2017
@@ -187,7 +187,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-complementary">
           <span>+180°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
               <metadata>
@@ -230,7 +230,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-triadic">
           <span>-120°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
               <metadata>
@@ -275,7 +275,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-base">
           <span>BASE 0°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 1280 1280"
               preserveAspectRatio="xMidYMid meet">
               <metadata>
@@ -318,7 +318,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-analogous">
           <span>+45°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
@@ -361,7 +361,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-complementary">
           <span>+180°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
@@ -404,7 +404,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-triadic">
           <span>-120°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
@@ -449,7 +449,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-base">
           <span>BASE 0°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
               Created by potrace 1.15, written by Peter Selinger 2001-2017
@@ -491,7 +491,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-analogous">
           <span>+45°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
@@ -534,7 +534,7 @@ author: mous_tik
       <div class="color-card">
         <div class="color-swatch swatch-complementary">
           <span>+180°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
@@ -577,7 +577,7 @@ author: mous_tik
         <div class="color-card">
         <div class="color-swatch swatch-triadic">
           <span>-120°</span>
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg aria-hidden="true" version="1.0" xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1280 1280"
             preserveAspectRatio="xMidYMid meet">
             <metadata>
@@ -634,7 +634,7 @@ author: mous_tik
        En gros, le <code>clamp()</code> sert à limiter les valeurs dans une plage donnée (0 ou 1).
        On multiplie par 0.97 pour les couleurs sombres et par 0.03 pour les couleurs claires 
        pour faire en sorte que le contraste ne soit pas trop fort.
-       <mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">Mais ça ne marche pas.</mark><br>
+       <mark class="highlight">Mais ça ne marche pas.</mark><br>
        Je crois que le moteur de calcule panique. Le navigateur n'arrive pas à 
        prendre la valeur <code>l</code> de la variable <code>--bg</code> pour faire les calculs.
        En gros cela aurait permis d'avoir une variable de contraste qui s'adapte automatiquement
