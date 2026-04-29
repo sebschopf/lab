@@ -47,6 +47,7 @@
    On surcharge --size localement dans .brutal-word */
 .brutal-word > span {
     display: block;
+    --size: inherit;
     width: var(--size);
     height: var(--size);
     --offset-light-ideal: 4cqi;
