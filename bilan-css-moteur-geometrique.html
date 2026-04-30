@@ -1,0 +1,246 @@
+---
+layout: default
+title: "Bilan d'Expérience : Le CSS comme Moteur Géométrique"
+subtitle: "Résumé des résultats, concepts utilisés et limites de notre typographie réactive sans SVG ni JS."
+level: 3
+tags: ["CSS", "Bilan", "Brutalisme", "Clip-path", "@property", "CQI"]
+date: 2026-04-30
+author: mous_tik
+---
+
+<section class="doc-section">
+    <p>Ce bilan clôt le cycle d'expérimentations autour de la typographie géométrique en CSS pur.
+    Le défit était de créer des animations typographiques sans SVG, sans JavaScript,
+    sans fichier de police externe en s'appuyant sur l'
+    <a role="link" aria-roledescription="lien vers l'expérimentation" href="https://example.com/experimentation">
+        expérimentation d'Nguyen Grobber et Armin Hofmann
+    </a>: seulement des variables CSS, des <code>clip-path</code> et des maths.<br>
+    Voici ce qui a fonctionné, ce qui a cassé, et où ça peut encore aller,
+    Au delà de mes limites de connaissances actuelles.</p>
+</section>
+
+<section class="doc-section">
+    <h2>Table des matières</h2>
+    <ul>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section résultats"
+            href="#resultats">1 à 6. Ce qui a fonctionné
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section limites"
+            href="#limites">Limites rencontrées
+        </a></li>
+        <li><a
+            role="link"
+            aria-roledescription="lien vers la section perspectives"
+            href="#perspectives">Perspectives
+        </a></li>
+    </ul>
+</section>
+
+<section class="doc-section" id="resultats">
+    <h2>Ce qui a fonctionné</h2>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">1</div>
+        <div>
+            <h3>Le Rendu Data-Driven (HTML = Donnée)</h3>
+            <p><strong>L'idée de base :</strong> Utiliser un attribut HTML
+            (<code>data-matrice-char="X"</code>) comme seule source de vérité,
+            et laisser le CSS décider de la forme géométrique à afficher
+            via des sélecteurs conditionnels.</p>
+            <p><strong>Résultat :</strong> Un HTML parfaitement propre et sémantique.
+            Le navigateur lit la donnée brute et le CSS applique le <code>clip-path</code>
+            correspondant. Cela sépare strictement le fond (l'identité de la lettre)
+            de la forme (les coordonnées).</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">2</div>
+        <div>
+            <h3>La Matrice 4x4 et le Calcul Géométrique</h3>
+            <p><strong>L'idée :</strong> Remplacer le dessin vectoriel par une équation.
+            Nous avons construit une grille de carrés imbriqués générant 256 points d'ancrage
+            relatifs (les variables <code>--A-x1</code> à <code>--D-x4</code>
+            et <code>--R1-y1</code> à <code>--R4-y4</code>).</p>
+            <p><strong>Résultat :</strong> Une cohérence visuelle interprétable. Chaque trait,
+            chaque biseau est dicté par une seule variable maîtresse : <code>--offset</code>.
+            Modifier cette variable recalcule instantanément l'intégralité de la lettre.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">3</div>
+        <div>
+            <h3>La Fente et la Non-Zero Winding Rule</h3>
+            <p><strong>L'idée :</strong> Percer des trous dans des polygones
+            (pour le "O", le "A", le "B") sans utiliser de calques superposés
+            (<code>::before</code>/<code>::after</code>),
+            afin de conserver l'interaction avec <code>filter: drop-shadow()</code>.</p>
+            <p><strong>Résultat :</strong> En traçant le contour extérieur dans le sens horaire,
+            en créant une "fente" invisible vers le centre, puis en traçant le trou dans le
+            sens anti-horaire, le navigateur évide la zone (1 - 1 = 0). L'ombre portée reste
+            dure et respecte la transparence intérieure de la lettre.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">4</div>
+        <div>
+            <h3>Le Polymorphisme Intrinsèque (CQI &amp; Clamp)</h3>
+            <p><strong>L'idée :</strong> Abandonner les Media Queries. La lettre doit connaître
+            sa propre taille pour éviter que son épaisseur ne détruise sa géométrie
+            sur les petits écrans.</p>
+            <p><strong>Résultat :</strong> En déclarant <code>container-type: inline-size</code>
+            sur la lettre, nous avons pu utiliser l'unité <code>cqi</code>
+            (Container Query Inline) couplée à la fonction mathématique <code>clamp()</code>.
+            La lettre gère sa propre graisse proportionnellement à l'espace dont elle dispose.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">5</div>
+        <div>
+            <h3>L'Animation de Type avec @property (Houdini)</h3>
+            <p><strong>L'idée :</strong> Animer la graisse de la police (le fameux
+            <code>--offset</code>) de manière fluide au survol ou au clic, sans Javascript.</p>
+            <p><strong>Résultat :</strong> Une petite réussite personnelle. En utilisant
+            <code>@property --offset { syntax: '&lt;length&gt;'; inherits: true; initial-value: 12px; }</code>,
+            le navigateur a compris que cette chaîne de texte était une mesure physique.
+            Le CSS peut désormais interpoler nativement le passage de 12px à 20px,
+            recalculant toute la grille en temps réel.</p>
+            <p><strong>Note :</strong> La valeur <code>inherits: true</code> est critique.
+            Sans elle, les pseudo-éléments <code>::after</code> ne reçoivent pas la mise à jour
+            et la transition casse silencieusement.</p>
+        </div>
+    </div>
+
+    <div class="checklist-item">
+        <div class="checklist-number" aria-hidden="true">6</div>
+        <div>
+            <h3>Deux Philosophies d'Implémentation</h3>
+            <p><strong>La découverte :</strong> Au fil des expérimentations, deux approches
+            architecturales ont émergé pour déclarer la forme d'un glyphe.</p>
+            <p><strong>Approche A : la variable intermédiaire <code>--glyph</code>.</strong>
+            Le <code>clip-path</code> complet est stocké dans une custom property,
+            puis assigné à <code>::after</code>. Le navigateur met en cache la valeur
+            de la variable. La surcharge par sélecteur plus spécifique ou par classe
+            devient plus évidente.</p>
+            <p><strong>Approche B : le polygone direct sur <code>::after</code>.</strong>
+            Les coordonnées sont écrites directement sur le pseudo-élément. Plus immédiat,
+            mais chaque surcharge oblige à réécrire l'intégralité du polygone.</p>
+            <p><strong>Conséquence :</strong> Ce n'est pas qu'une préférence de style.
+            L'approche A exploite le mécanisme de cascade et d'héritage du navigateur
+            comme une couche de mémoire : on déclare une intention, le moteur de rendu
+            résout la valeur finale. Ce principe est exportable à d'autres contextes
+            bien au-delà de la typographie.</p>
+        </div>
+    </div>
+</section>
+
+<section class="doc-section" id="limites">
+    <h2>Limites Rencontrées</h2>
+
+    <ul>
+        <li><strong>L'implosion par écrasement :</strong> Malgré le <code>clamp()</code>,
+            il existe un point de rupture mathématique. Si la lettre est contenue dans une
+            boîte de 40px et que l'on force un <code>--offset</code> (graisse) de 20px,
+            l'espace vide (le gap) devient négatif. Les axes X et Y se croisent de manière
+            chaotique. Le trou du "O" s'inverse et la forme implose.</li>
+        <li><strong>L'absence de "Move-To" dans le clip-path :</strong> C'est la plus grande
+            frustration. Contrairement au SVG qui possède la commande <code>M</code>
+            (déplacer le stylo sans dessiner), <code>clip-path: polygon()</code> trace une
+            ligne continue. C'est ce qui nous oblige à utiliser le hack complexe de
+            "La Fente". Coder la lettre "B" a nécessité 26 points de coordonnées et un
+            double aller-retour mental pour évider les deux trous sans casser la forme.
+            C'est inmaintenable à l'échelle d'une police complète sans générateur.</li>
+        <li><strong>La gestion des états globaux :</strong> Utiliser le
+            <em>Checkbox Hack</em> (<code>:checked ~</code>) pour stocker l'état
+            (ex: Mode Light/Dark) fonctionne parfaitement, mais reste confiné au parent
+            immédiat. Sans JS, on ne peut pas propager un état d'une case à cocher vers
+            un élément qui se trouve dans une autre branche du DOM (hors fratrie).</li>
+        <li><strong>La déchirure géométrique avec <code>steps()</code> et OKLCH :</strong>
+            Dans l'expérimentation des ondes chromatiques (<code>animations.css</code>),
+            on anime la teinte d'une couleur <code>oklch()</code> en faisant varier un
+            angle de teinte stocké dans une custom property <code>--dynamic-h</code>.
+            L'idée : changer la couleur des lettres par saccades (<code>steps(15)</code>)
+            pour un effet d'onde mécanique sur le mot COMBAT.
+            Le problème : animer <code>--dynamic-h</code> sur un élément qui combine
+            <code>clip-path</code> (sur <code>::after</code>) et
+            <code>filter: drop-shadow</code> (sur le parent) provoque une corruption visuelle.
+            Le navigateur échoue à synchroniser le recalcul de la couleur avec la découpe
+            du polygone lors d'un repaint brutal imposé par <code>steps()</code>.
+            Les coordonnées de la matrice 4x4 sont perdues, les tracés avec fente
+            (lettres O, A, B) implosent, l'ombre se détache de la forme.
+            Cause probable : <code>--dynamic-h</code> n'est pas typée via
+            <code>@property</code>. Le navigateur la traite donc comme un token de texte
+            opaque et invalide l'intégralité de l'arbre de styles à chaque changement,
+            au lieu d'isoler uniquement le recalcul de couleur. La même technique que
+            pour <code>--offset</code> (point 5) devrait s'appliquer : déclarer
+            <code>@property --dynamic-h { syntax: '&lt;number&gt;'; inherits: true; initial-value: 330; }</code>
+            pour que le navigateur sache exactement ce qui change et limite la propagation
+            de l'invalidation. À tester.
+            <a role="link"
+                aria-roledescription="lien vers le bug GitHub"
+                href="https://github.com/sebschopf/lab/issues/1">Issue #1</a></li>
+    </ul>
+</section>
+
+<section class="doc-section" id="perspectives">
+    <h2>Perspectives</h2>
+
+    <p>Ces pistes n'ont pas encore été testées, mais le système de matrice
+    pose les bases nécessaires pour les attaquer.</p>
+
+    <h3>L'Extrusion Isométrique 3D</h3>
+    <p>Puisque la lettre est découpée dans un polygone calculé, il est possible d'empiler
+    plusieurs couches (via des ombres portées multiples modifiées ou des pseudo-éléments
+    empilés avec un décalage calculé via <code>calc()</code>) pour créer de la fausse 3D
+    réactive qui réagit à la position du curseur. (on peut respirer... la phrase est longue :))</p>
+
+    <h3>La Typographie Procédurale (Glitches)</h3>
+    <p>Plutôt que d'animer <code>--offset</code> proprement, on pourrait appliquer
+    des animations <code>@keyframes</code> distinctes et saccadées sur des variables
+    spécifiques (ex: animer uniquement <code>--A-x2</code>). La lettre se déformerait,
+    s'étirerait mécaniquement.</p>
+
+    <h3>La Gamification Logique (Jeux CSS)</h3>
+    <p>En utilisant les <code>checkbox</code> comme bits de mémoire (0 ou 1) et le
+    <code>clip-path</code> comme Hitbox physique (si je survole le noir = Game Over),
+    nous aurions de quoi construire de vrais puzzles logiques sans une seule ligne de JS.</p>
+
+    <h3>La Matrice à Résolution Variable</h3>
+    <p>La grille 4x4 donne 256 points d'ancrage. Une grille 8x8 en donnerait 1024,
+    une 16x16 plus de 4000. Plus la résolution augmente, plus les formes peuvent être
+    complexes : courbes approximées par segments courts, diagonales plus fines,
+    détails sub-pixel. Le coût : une explosion du nombre de variables CSS et un recalcul
+    plus lourd à chaque changement d'<code>--offset</code>. Un temps de positionnement
+    des points plus long.<br>
+    À partir de quelle résolution le navigateur sature-t-il ? Il est probable que les 
+    navigateurs optimisent les changements mineurs en ne recalculant que les points affectés,
+    mais cela reste à mesurer.</p>
+
+    <h3>Au-delà de la Typographie</h3>
+    <p>Le principe n'est pas limité aux lettres. N'importe quelle forme géométrique
+    paramétrique peut être construite avec cette approche : icônes réactives, interfaces
+    de données (sparklines CSS, jauges polygonales), masques de mise en page qui
+    s'adaptent au contenu. Le <code>clip-path</code> comme outil de layout,pas 
+    seulement de décoration.</p>
+
+    <h3>Le Générateur de Glyphes</h3>
+    <p>Coder la lettre B à la main en 26 points est inmaintenable. La prochaine étape
+    logique est un outil qui prend une forme dessinée et génère automatiquement les
+    coordonnées de la matrice en CSS : variables, fentes, respect de la Non-Zero Winding
+    Rule. Le CSS comme format de sortie d'un générateur, pas comme code écrit à la main.</p>
+</section>
+
+<section class="doc-section">
+    <p><mark role="emphasis" aria-roledescription="mise en évidence" class="highlight">
+        Le CSS n'est pas qu'un langage de mise en forme.
+        C'est un langage déclaratif : logique, calcul, propagation d'état.</mark>
+    Ce cycle d'expérimentations en est la preuve. La suite au prochain épisode.
+    (je suis fatigué là :D)</p>
+</section>
