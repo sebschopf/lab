@@ -45,3 +45,7 @@
 - name: matrice / anim.
   url: /animations.html
   group: Matrice
+
+- name: matrice / bilan
+  url: /bilan-css-moteur-geometrique.html
+  group: Matrice
